@@ -1232,8 +1232,65 @@ window.toggleSfxMute = function () {
 };
 
 window.toggleCRTLines = function () {
-  document.body.classList.toggle('crt-enabled');
-  showToast('📺 Retro CRT Scanline Filter Toggled');
+  const isEnabled = document.body.classList.toggle('crt-enabled');
+  const btn = document.getElementById('crt-toggle-btn');
+  if (btn) {
+    btn.textContent = isEnabled ? '📺 CRT: ON' : '📺 CRT: OFF';
+  }
+  showToast(isEnabled ? '📺 Retro CRT Scanline Filter: ON' : '📺 Retro CRT Scanline Filter: OFF');
+};
+
+window.toggleRainMode = function () {
+  const rainOverlay = document.getElementById('rain-overlay');
+  const btn = document.getElementById('rain-toggle-btn');
+  const isPlaying = window.soundEngine.toggleRainAudio();
+
+  if (rainOverlay) {
+    if (isPlaying) {
+      rainOverlay.innerHTML = '';
+      for (let i = 0; i < 65; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'pixel-raindrop';
+        drop.style.left = `${Math.random() * 100}vw`;
+        drop.style.animationDuration = `${0.65 + Math.random() * 0.65}s`;
+        drop.style.animationDelay = `${Math.random() * 1.5}s`;
+        drop.style.height = `${14 + Math.random() * 18}px`;
+        rainOverlay.appendChild(drop);
+      }
+      rainOverlay.classList.add('active');
+    } else {
+      rainOverlay.classList.remove('active');
+      rainOverlay.innerHTML = '';
+    }
+  }
+
+  if (btn) {
+    btn.textContent = isPlaying ? '🌧️ RAIN: ON' : '🌧️ RAIN: OFF';
+  }
+  showToast(
+    isPlaying
+      ? '🌧️ Cozy Pixel Rain Mode & Soothing Rain Audio: ON'
+      : '🌧️ Rain Mode: OFF'
+  );
+};
+
+window.toggleVinylMode = function () {
+  const isPlaying = window.soundEngine.toggleVinylAudio();
+  const btn = document.getElementById('vinyl-toggle-btn');
+  const deck = document.getElementById('vinyl-floating-deck');
+
+  document.body.classList.toggle('vinyl-mode-enabled', isPlaying);
+  if (deck) {
+    deck.classList.toggle('active', isPlaying);
+  }
+  if (btn) {
+    btn.textContent = isPlaying ? '💿 VINYL: ON' : '💿 VINYL: OFF';
+  }
+  showToast(
+    isPlaying
+      ? '💿 Warm Analog Vinyl Crackle & Spinning Record Mode: ON'
+      : '💿 Vinyl Mode: OFF'
+  );
 };
 
 window.openModal = function (htmlContent) {

@@ -43,11 +43,17 @@
         <button id="ambient-toggle-btn" class="pixel-btn" onclick="toggleAmbientLounge()">
           🎵 LO-FI SYNTH: OFF
         </button>
+        <button id="rain-toggle-btn" class="pixel-btn" onclick="toggleRainMode()">
+          🌧️ RAIN: OFF
+        </button>
+        <button id="vinyl-toggle-btn" class="pixel-btn gold-btn" onclick="toggleVinylMode()">
+          💿 VINYL: OFF
+        </button>
         <button id="sfx-toggle-btn" class="pixel-btn lime-btn" onclick="toggleSfxMute()">
           🔊 8-BIT SFX: ON
         </button>
-        <button class="pixel-btn magenta-btn" onclick="toggleCRTLines()">
-          📺 CRT SCANLINES
+        <button id="crt-toggle-btn" class="pixel-btn magenta-btn" onclick="toggleCRTLines()">
+          📺 CRT: ON
         </button>
       </div>
     </div>
@@ -521,6 +527,18 @@
   <div id="tour-banner-bar" class="tour-banner-bar">
     <span id="tour-banner-text">🎬 LIVE FEATURE TOUR RUNNING...</span>
     <button class="pixel-btn magenta-btn" onclick="stopJudgePresentation()">STOP TOUR ✖</button>
+  </div>
+
+  <!-- Cozy Neon Pixel Rain Overlay -->
+  <div id="rain-overlay" class="rain-overlay"></div>
+
+  <!-- Floating Spinning Retro Vinyl Deck Widget -->
+  <div id="vinyl-floating-deck" class="vinyl-floating-deck" onclick="toggleVinylMode()" title="Click to toggle Vinyl Crackle Mode">
+    <div class="vinyl-disc"></div>
+    <div class="vinyl-deck-info">
+      <span>💿 VINYL CRACKLE DECK</span>
+      <span class="vinyl-deck-sub">WARM LO-FI ANALOG MODE • ON</span>
+    </div>
   </div>
 
   <!-- Scripts -->

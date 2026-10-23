@@ -1059,10 +1059,10 @@ body.crt-enabled::after {
   inset: 0;
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.38) 0px,
-    rgba(0, 0, 0, 0.38) 2px,
-    transparent 2px,
-    transparent 4px
+    rgba(0, 0, 0, 0.08) 0px,
+    rgba(0, 0, 0, 0.08) 1px,
+    transparent 1px,
+    transparent 6px
   );
   pointer-events: none;
   z-index: 2;
@@ -1113,10 +1113,10 @@ body.crt-enabled::after {
 
 .crt-typewriter-box {
   font-family: var(--font-pixel);
-  font-size: 0.92rem;
-  line-height: 1.95;
+  font-size: 1.05rem;
+  line-height: 2.25;
   color: #ffe66d;
-  text-shadow: 0 0 10px rgba(255, 230, 109, 0.75), 2px 2px 0px #000;
+  text-shadow: 2px 2px 0px #000;
   min-height: 220px;
   white-space: pre-wrap;
 }

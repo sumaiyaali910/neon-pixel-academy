@@ -201,103 +201,98 @@
 
     const SCENES = [
       {
-        duration: 8.5,
+        duration: 12.5,
         mode: 'crt',
-        header: 'SCENE 01 / 06 // DIAGNOSTIC TERMINAL [CRT-9000]',
-        badge: '⚠️ THE PROBLEM: WHY STUDENTS STRUGGLE WITH BORING PORTALS',
+        header: 'SCENE 01 / 06 // THE PROBLEM [CRT-9000]',
+        badge: '⚠️ THE PROBLEM',
         lines: [
-          '> SCANNING TRADITIONAL EDUCATIONAL WEBSITES...',
+          '• Learning websites are boring & stressful, and students',
+          '  get stuck on questions alone with no instant visual help.',
           '',
-          '1. BORING & STRESSFUL UI: Standard portals look lifeless and drain motivation.',
-          '2. STUCK ON PROBLEMS ALONE: No instant visual explanations when studying at night.',
-          '3. SLOW TEACHER ACCESS: Days of waiting just to ask a question or book a slot.',
-          '4. FULL GAMING ZONES: Campus indoor/outdoor game seats fill up before class ends!'
+          '• Reaching teachers takes too long, and campus game',
+          '  seats fill up before class even ends!'
+        ]
+      },
+      {
+        duration: 13.5,
+        mode: 'crt',
+        header: 'SCENE 02 / 06 // THE SOLUTION [CRT-9000]',
+        badge: '💡 OUR SOLUTION: NEON PIXEL ACADEMY + WEBSITE AI',
+        lines: [
+          '• Built-In Website Gemini AI Tutor: Answers ANY general or',
+          '  study question instantly with visual solution diagrams!',
+          '',
+          '• All-in-One Retro Hub: 1-Click Teacher SOS, Notes & PDFs,',
+          '  3D Flashcards, and Pre-Booking Game Seats before class!'
         ]
       },
       {
         duration: 9.0,
-        mode: 'crt',
-        header: 'SCENE 02 / 06 // AI ARCHITECTURE & SOLUTION [CRT-9000]',
-        badge: '💡 THE SOLUTION: NEON PIXEL ACADEMY + SECURE GEMINI AI',
-        lines: [
-          '> INITIALIZING NEON PIXEL ACADEMY (NAVY & CYAN RETRO LOUNGE)...',
-          '',
-          '★ RELAXING 16-BIT VIBE: Every click sparks chiptune SFX, neon bursts & lo-fi synth!',
-          '★ SECURE GEMINI AI (/api/gemini): Reads process.env.GEMINI_API_KEY on the backend.',
-          '★ ANSWERS ANYTHING + VISUAL DIAGRAMS: Solves any general or academic problem!',
-          '★ 1-CLICK TEACHER SOS & SEAT RADAR: Reach teachers or book game seats before the bell!'
-        ]
-      },
-      {
-        duration: 6.5,
         mode: 'ui_hero_ai',
-        header: 'SCENE 03 / 06 // LIVE SCREEN RECORDING: HERO & GEMINI AI TERMINAL',
-        subtitle: 'Asking Gemini AI a Physics Force Problem -> Live Step-by-Step Solution & Force Diagram!'
+        header: 'SCENE 03 / 06 // LIVE SCREEN RECORDING: WEBSITE AI & VISUAL SOLUTION',
+        subtitle: 'Built-In Website Gemini AI solves a Physics Force problem + draws the Force Diagram!'
       },
       {
-        duration: 6.0,
+        duration: 8.5,
         mode: 'ui_teachers_library',
         header: 'SCENE 04 / 06 // LIVE SCREEN RECORDING: 1-CLICK TEACHER SOS & NOTES VAULT',
-        subtitle: 'Pinging Prof. Aria Vance via 1-Click SOS Beacon + Opening Study Notes, PDFs & Web Portals!'
+        subtitle: 'Pinging Prof. Aria Vance via 1-Click SOS + Opening Study Notes, PDF Books & Web Portals!'
       },
       {
-        duration: 6.0,
+        duration: 8.5,
         mode: 'ui_flashcards_arena',
         header: 'SCENE 05 / 06 // LIVE SCREEN RECORDING: 3D FLASHCARDS & GAME SEAT PRE-BOOKING',
         subtitle: 'Flipping 3D Neon Flashcards + Pre-Booking Indoor Table Tennis Seat Before Class Ends!'
       },
       {
-        duration: 4.5,
+        duration: 7.5,
         mode: 'crt',
-        header: 'SCENE 06 / 06 // JUDGE PRESENTATION COMPLETE',
+        header: 'SCENE 06 / 06 // PRESENTATION COMPLETE',
         badge: '🏆 NEON PIXEL ACADEMY // READY FOR JUDGE Q&A!',
         lines: [
-          '> ALL MODULES VERIFIED & LIVE ON VERCEL!',
+          '✔ Built-In Website Gemini AI (General & Study Q&A + Diagrams)',
           '',
-          '✔ Retro Navy Blue (#0a1128) & Electric Cyan (#00f5d4) Pixel Theme',
-          '✔ Secure /api/gemini Route (process.env.GEMINI_API_KEY)',
-          '✔ General & Academic AI + Visual Solution Diagrams',
-          '✔ 1-Click Teacher SOS, Notes/PDFs, 3D Flashcards & Game Seat Pre-Booking!'
+          '✔ 1-Click Teacher SOS, Notes/PDFs, Flashcards & Seat Booking!'
         ]
       }
     ];
 
     function drawCRTScanlines() {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
-      for (let y = 0; y < canvas.height; y += 4) {
-        ctx.fillRect(0, y, canvas.width, 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+      for (let y = 0; y < canvas.height; y += 8) {
+        ctx.fillRect(0, y, canvas.width, 1);
       }
     }
 
     function drawCRTScene(scene, localT) {
       // Black CRT Background
-      ctx.fillStyle = '#020307';
+      ctx.fillStyle = '#03050a';
       ctx.fillRect(0, 0, 1280, 720);
 
       // Subtle CRT Bezel
       ctx.strokeStyle = '#ffd166';
       ctx.lineWidth = 4;
-      ctx.strokeRect(36, 32, 1208, 656);
+      ctx.strokeRect(42, 36, 1196, 648);
 
       // Header
       ctx.fillStyle = '#ffd166';
-      ctx.font = '16px "Press Start 2P", monospace';
-      ctx.fillText(scene.header, 68, 78);
-      ctx.fillRect(68, 94, 1144, 2);
+      ctx.font = '18px "Press Start 2P", monospace';
+      ctx.fillText(scene.header, 76, 86);
+      ctx.fillRect(76, 104, 1128, 2);
 
       // Badge
       ctx.fillStyle = 'rgba(255, 209, 102, 0.14)';
-      ctx.fillRect(68, 122, 980, 44);
+      ctx.fillRect(76, 134, 980, 50);
       ctx.strokeStyle = '#ffd166';
       ctx.lineWidth = 2;
-      ctx.strokeRect(68, 122, 980, 44);
+      ctx.strokeRect(76, 134, 980, 50);
       ctx.fillStyle = '#ffe66d';
-      ctx.font = '15px "Press Start 2P", monospace';
-      ctx.fillText(scene.badge, 86, 151);
+      ctx.font = '17px "Press Start 2P", monospace';
+      ctx.fillText(scene.badge, 96, 168);
 
-      // Typewriter Text Calculation
+      // Slow, Relaxed Typewriter Text Calculation (Leaves 4.5s after typing to read comfortably!)
       const fullText = scene.lines.join('\n');
-      const typeDuration = scene.duration - 1.6;
+      const typeDuration = Math.max(2.5, scene.duration - 4.8);
       const progress = Math.min(1, localT / typeDuration);
       const charCount = Math.floor(fullText.length * progress);
 
@@ -310,22 +305,19 @@
       const visibleLines = visibleText.split('\n');
 
       ctx.fillStyle = '#ffe66d';
-      ctx.shadowColor = 'rgba(255, 230, 109, 0.75)';
-      ctx.shadowBlur = 10;
-      ctx.font = '16px "Press Start 2P", monospace';
+      ctx.font = '20px "Press Start 2P", monospace';
 
-      let y = 218;
+      let y = 260;
       visibleLines.forEach((line, i) => {
-        ctx.fillText(line, 68, y);
+        ctx.fillText(line, 76, y);
         if (i === visibleLines.length - 1) {
           const w = ctx.measureText(line).width;
-          if (Math.floor(localT * 3) % 2 === 0) {
-            ctx.fillRect(68 + w + 8, y - 18, 14, 22);
+          if (Math.floor(localT * 2.5) % 2 === 0) {
+            ctx.fillRect(76 + w + 10, y - 22, 16, 26);
           }
         }
-        y += 52;
+        y += 66;
       });
-      ctx.shadowBlur = 0;
 
       drawCRTScanlines();
     }

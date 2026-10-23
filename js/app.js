@@ -1260,7 +1260,7 @@ function clearPresentationTimers() {
   document.querySelectorAll('.tour-spotlight').forEach((el) => el.classList.remove('tour-spotlight'));
 }
 
-function typewriteYellowCRT(text, speedMs = 34, onComplete) {
+function typewriteYellowCRT(text, speedMs = 55, onComplete) {
   const textEl = document.getElementById('crt-typewriter-text');
   if (!textEl) return;
   textEl.textContent = '';
@@ -1278,7 +1278,7 @@ function typewriteYellowCRT(text, speedMs = 34, onComplete) {
       const delay = ch === '\n' ? speedMs * 4 : ch === '.' || ch === '!' ? speedMs * 3 : speedMs;
       presentationTimers.push(setTimeout(step, delay));
     } else if (onComplete) {
-      presentationTimers.push(setTimeout(onComplete, 1800));
+      presentationTimers.push(setTimeout(onComplete, 4200));
     }
   }
   step();
@@ -1297,32 +1297,26 @@ window.startJudgePresentation = function () {
   if (tourBar) tourBar.classList.remove('active');
   if (overlay) overlay.classList.add('active');
 
-  // SCENE 1: THE PROBLEM ON BLACK CRT
-  if (counter) counter.textContent = 'SCENE 01 / 02 // PROBLEM STATEMENT';
-  if (badge) badge.textContent = '⚠️ THE PROBLEM: WHY STUDENTS STRUGGLE TODAY';
+  // SCENE 1: THE PROBLEM ON BLACK CRT (SHORT & EASY TO READ)
+  if (counter) counter.textContent = 'SCENE 01 / 02 // THE PROBLEM';
+  if (badge) badge.textContent = '⚠️ THE PROBLEM';
 
   const problemScript =
-    '> INITIALIZING CAMPUS DIAGNOSTIC...\n\n' +
-    '1. BORING, LIFELESS PORTALS: Traditional educational websites feel cold, stressful, and exhausting to use.\n' +
-    '2. STUCK ON TOUGH PROBLEMS: Students get stuck on Physics, Math, or Coding at home with no instant visual explanation.\n' +
-    '3. DELAYED TEACHER HELP: Reaching teachers or booking 1-on-1 help takes days of back-and-forth emails.\n' +
-    '4. CROWDED BREAK ARENAS: Indoor & outdoor gaming seats fill up before class even ends!';
+    '• Learning websites are boring and stressful, and students get stuck on questions with no instant help.\n\n' +
+    '• Reaching teachers takes too long, and campus game seats fill up before class ends!';
 
-  typewriteYellowCRT(problemScript, 28, () => {
-    // SCENE 2: THE AI & RETRO LOUNGE SOLUTION ON BLACK CRT
+  typewriteYellowCRT(problemScript, 55, () => {
+    // SCENE 2: THE SOLUTION ON BLACK CRT (HIGHLIGHTING WEBSITE AI)
     if (!presentationActive) return;
     window.soundEngine.playSuccess();
-    if (counter) counter.textContent = 'SCENE 02 / 02 // OUR AI-POWERED SOLUTION';
-    if (badge) badge.textContent = '💡 THE SOLUTION: NEON PIXEL ACADEMY + GEMINI AI';
+    if (counter) counter.textContent = 'SCENE 02 / 02 // THE AI SOLUTION';
+    if (badge) badge.textContent = '💡 OUR SOLUTION: NEON PIXEL ACADEMY';
 
     const solutionScript =
-      '> DEPLOYING NEON PIXEL ACADEMY (v2.6)...\n\n' +
-      '★ RELAXING NAVY & CYAN RETRO LOUNGE: Every click sparks 8-bit chiptune sounds, neon bursts, and chill synthwave audio.\n' +
-      '★ SECURE GEMINI AI TUTOR (/api/gemini): Answers ANY general or academic question & draws live visual solution diagrams!\n' +
-      '★ 1-CLICK TEACHER SOS & BOOKING: Ping teachers in one click or book office hours.\n' +
-      '★ PRE-BOOK GAMING SEATS: Lock in indoor/outdoor game seats before the class bell rings!';
+      '• Built-In Website Gemini AI Tutor: Answers ANY general or study question instantly with visual solution diagrams!\n\n' +
+      '• All-in-One Retro Hub: 1-Click Teacher SOS, Notes/PDFs, 3D Flashcards, and Pre-Booking Game Seats before class ends!';
 
-    typewriteYellowCRT(solutionScript, 26, () => {
+    typewriteYellowCRT(solutionScript, 55, () => {
       if (!presentationActive) return;
       skipToLiveFeatureTour();
     });
@@ -1343,7 +1337,7 @@ window.skipToLiveFeatureTour = function () {
 
   const tourSteps = [
     {
-      delay: 200,
+      delay: 300,
       selector: '.hero-banner',
       caption: '🎬 [1/6] RETRO NAVY & CYAN HERO SANCTUARY: 16-Bit Pixel Art Problem -> AI -> Mastery Workflow & Lo-Fi Synthwave!',
       action: () => {
@@ -1351,16 +1345,16 @@ window.skipToLiveFeatureTour = function () {
       },
     },
     {
-      delay: 4200,
+      delay: 6500,
       selector: '#ai-workspace-section',
-      caption: '🤖 [2/6] SECURE GEMINI AI (/api/gemini): Answering ANY general or study question + Live Visual Force Vector Diagram!',
+      caption: '🤖 [2/6] BUILT-IN WEBSITE GEMINI AI (/api/gemini): Answers ANY general or study question + Live Visual Solution Diagram!',
       action: () => {
         document.getElementById('ai-workspace-section').scrollIntoView({ behavior: 'smooth' });
         fillPresetPrompt('Explain Newtons Second Law with a 5kg block and 20N force vector solution', 'Physics', 'solve');
       },
     },
     {
-      delay: 9000,
+      delay: 14000,
       selector: '#teacher-section',
       caption: '🚨 [3/6] TEACHER COMMAND CENTER: 1-Click SOS Beacon for instant help & 1-on-1 Appointment Booking!',
       action: () => {
@@ -1368,7 +1362,7 @@ window.skipToLiveFeatureTour = function () {
       },
     },
     {
-      delay: 13200,
+      delay: 20500,
       selector: '#library-section',
       caption: '📚 [4/6] ARCADE KNOWLEDGE VAULT: Subject Categories, Study Notes, Illustrated PDF Books & Web Portals!',
       action: () => {
@@ -1376,16 +1370,16 @@ window.skipToLiveFeatureTour = function () {
       },
     },
     {
-      delay: 17200,
+      delay: 27000,
       selector: '#revision-section',
       caption: '🃏 [5/6] 3D PIXEL FLASHCARDS & BOSS QUIZ: Flip 3D solution cards and battle through revision questions!',
       action: () => {
         document.getElementById('revision-section').scrollIntoView({ behavior: 'smooth' });
-        setTimeout(() => flipFlashcard(), 1200);
+        setTimeout(() => flipFlashcard(), 1800);
       },
     },
     {
-      delay: 21500,
+      delay: 33500,
       selector: '#arena-section',
       caption: '🏓 [6/6] GAME ARENA SEAT RADAR: Pre-book Indoor & Outdoor gaming seats BEFORE class ends!',
       action: () => {
@@ -1393,11 +1387,11 @@ window.skipToLiveFeatureTour = function () {
         setTimeout(() => {
           clickSeatSlot('TT-B1', false);
           confirmSeatReservation();
-        }, 1200);
+        }, 1800);
       },
     },
     {
-      delay: 26500,
+      delay: 40500,
       selector: '#events-section',
       caption: '🏆 PRESENTATION COMPLETE! Join Campus Quests in 1 Click — Ready for Judge Q&A!',
       action: () => {

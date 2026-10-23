@@ -2,7 +2,6 @@
   "name": "neon-pixel-academy",
   "version": "2.6.0",
   "description": "Retro 16-Bit Navy Blue & Cyan Educational Hub with Secure Gemini API Server Route",
-  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "python server.py"

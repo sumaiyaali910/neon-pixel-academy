@@ -1,13 +1,13 @@
 /**
- * Express / Node.js Backend Server (`server.js`)
+ * Express / Node.js & Vercel Compatible Server (`server.js`)
  *
- * Serves the Retro Pixelated Educational Hub and handles `/api/gemini` POST calls.
- * Fetches the API key exclusively from `process.env.GEMINI_API_KEY`.
- * Answers ANY general, conversational, coding, creative, or academic question just like Gemini!
+ * Serves static files locally OR when invoked as a Vercel serverless handler,
+ * and handles `/api/gemini` POST calls using `process.env.GEMINI_API_KEY`.
  */
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const geminiHandler = require('./api/gemini');
 
 const PORT = process.env.PORT || 3000;
 
@@ -18,97 +18,68 @@ const MIME_TYPES = {
   '.json': 'application/json; charset=utf-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
   '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
 };
 
-const server = http.createServer(async (req, res) => {
-  if (req.method === 'POST' && req.url === '/api/gemini') {
-    let body = '';
+async function requestListener(req, res) {
+  const safeUrl = (req.url || '/').split('?')[0];
+
+  // Route /api/gemini to our serverless function handler
+  if (safeUrl === '/api/gemini') {
+    let rawBody = '';
     req.on('data', (chunk) => {
-      body += chunk.toString();
+      rawBody += chunk.toString();
     });
-
     req.on('end', async () => {
-      try {
-        const apiKey = process.env.GEMINI_API_KEY;
-        const parsed = JSON.parse(body || '{}');
-        const { prompt, subject = 'General (Anything)', mode = 'general', history = [] } = parsed;
-
-        if (!prompt || typeof prompt !== 'string') {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          return res.end(JSON.stringify({ error: 'A valid `prompt` string is required.' }));
-        }
-
-        if (!apiKey) {
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          return res.end(
-            JSON.stringify({
-              fallbackMode: true,
-              reply: `🦉 **[PIXEL-OWL 9000 // GENERAL AI]**\n\n Set \`GEMINI_API_KEY\` in your environment variables to connect live to Gemini 2.5 Flash for: "${prompt}".`,
-            })
-          );
-        }
-
-        const systemInstruction = `You are PIXEL-OWL 9000, a brilliant, versatile, and friendly general-purpose AI assistant (powered by Google Gemini) inside the Neon Pixel Academy lounge.
-You can answer ANY question on ANY topic — general knowledge, daily life, coding, creative writing, advice, math, science, gaming, history, pop culture, or casual conversation — just like Google Gemini!`;
-
-        const contents = [
-          ...history.slice(-8).map((m) => ({
-            role: m.role === 'assistant' ? 'model' : 'user',
-            parts: [{ text: String(m.content || '') }],
-          })),
-          { role: 'user', parts: [{ text: prompt }] },
-        ];
-
-        const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              system_instruction: { parts: [{ text: systemInstruction }] },
-              contents,
-            }),
-          }
-        );
-
-        const data = await geminiRes.json();
-        if (!geminiRes.ok) {
-          res.writeHead(geminiRes.status, { 'Content-Type': 'application/json' });
-          return res.end(
-            JSON.stringify({
-              error: data?.error?.message || 'Error communicating with Gemini API.',
-            })
-          );
-        }
-
-        const reply =
-          data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({ reply, model: 'gemini-2.5-flash', subject, mode }));
-      } catch (err) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({ error: err.message }));
+      req.body = rawBody;
+      // Polyfill Express/Vercel helper methods if running on raw http.Server
+      if (!res.status) {
+        res.status = (code) => {
+          res.statusCode = code;
+          return res;
+        };
       }
+      if (!res.json) {
+        res.json = (obj) => {
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.end(JSON.stringify(obj));
+        };
+      }
+      await geminiHandler(req, res);
     });
     return;
   }
 
-  let safeUrl = req.url.split('?')[0];
-  if (safeUrl === '/') safeUrl = '/index.html';
-  const filePath = path.join(__dirname, safeUrl);
+  // Serve static files from project root or public/
+  const relPath = safeUrl === '/' ? 'index.html' : safeUrl.replace(/^\/+/, '');
+  const candidatePaths = [
+    path.join(__dirname, relPath),
+    path.join(__dirname, 'public', relPath),
+  ];
 
-  fs.readFile(filePath, (err, content) => {
-    if (err) {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      return res.end('404 Not Found');
+  for (const filePath of candidatePaths) {
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      const ext = path.extname(filePath).toLowerCase();
+      res.writeHead(200, {
+        'Content-Type': MIME_TYPES[ext] || 'application/octet-stream',
+        'Cache-Control': 'public, max-age=0, must-revalidate',
+      });
+      return fs.createReadStream(filePath).pipe(res);
     }
-    const ext = path.extname(filePath).toLowerCase();
-    res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] || 'application/octet-stream' });
-    res.end(content);
-  });
-});
+  }
 
-server.listen(PORT, () => {
-  console.log(`NEON PIXEL ACADEMY running at http://localhost:${PORT}`);
-});
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('404 Not Found');
+}
+
+// Export for Vercel serverless runtime AND listen locally when run directly
+module.exports = requestListener;
+
+if (require.main === module) {
+  const server = http.createServer(requestListener);
+  server.listen(PORT, () => {
+    console.log(`NEON PIXEL ACADEMY running at http://localhost:${PORT}`);
+  });
+}

@@ -37,6 +37,9 @@
       </div>
 
       <div class="hud-actions">
+        <button class="pixel-btn gold-btn" onclick="startJudgePresentation()">
+          🎬 JUDGE PITCH VIDEO
+        </button>
         <button id="ambient-toggle-btn" class="pixel-btn" onclick="toggleAmbientLounge()">
           🎵 LO-FI SYNTH: OFF
         </button>
@@ -91,14 +94,17 @@
         </p>
 
         <div class="hero-cta-row">
+          <button class="pixel-btn gold-btn" onclick="startJudgePresentation()">
+            🎬 WATCH JUDGE PITCH (CRT + TOUR)
+          </button>
+          <a href="/pitch-video.html" class="pixel-btn lime-btn" style="text-decoration:none;">
+            📹 VIDEO STUDIO & MP4 DOWNLOAD
+          </a>
           <a href="#ai-workspace-section" class="pixel-btn" style="text-decoration:none;">
             ⚡ SOLVE A PROBLEM WITH AI
           </a>
           <a href="#teacher-section" class="pixel-btn magenta-btn" style="text-decoration:none;">
             🚨 1-CLICK TEACHER SOS
-          </a>
-          <a href="#arena-section" class="pixel-btn gold-btn" style="text-decoration:none;">
-            🏓 RESERVE GAME SEAT NOW
           </a>
         </div>
 
@@ -484,6 +490,37 @@
   <!-- Global Modal Dialog -->
   <div id="global-modal-backdrop" class="modal-backdrop" onclick="if(event.target===this) closeModal()">
     <div id="global-modal-content" class="modal-box"></div>
+  </div>
+
+  <!-- Black CRT Judge Presentation Intro Overlay -->
+  <div id="crt-intro-overlay" class="crt-intro-overlay">
+    <div class="crt-screen-header">
+      <span>📺 CRT-9000 JUDGE PRESENTATION TERMINAL // NEON PIXEL ACADEMY</span>
+      <span id="crt-scene-counter">SCENE 01 / 02</span>
+    </div>
+    <div class="crt-screen-body">
+      <div id="crt-stage-badge" class="crt-stage-badge">⚠️ STAGE 1: THE PROBLEM</div>
+      <div class="crt-typewriter-box"><span id="crt-typewriter-text"></span><span class="crt-cursor"></span></div>
+    </div>
+    <div class="crt-screen-footer">
+      <span style="font-family:var(--font-terminal);font-size:1.05rem;color:#ffe66d;">
+        🔊 CUTE 8-BIT TYPEWRITER AUDIO ACTIVE • AUTO-TRANSITIONING TO LIVE DEMO
+      </span>
+      <div style="display:flex;gap:0.6rem;">
+        <button class="pixel-btn gold-btn" onclick="skipToLiveFeatureTour()">
+          ⏭️ SKIP TO LIVE FEATURE TOUR
+        </button>
+        <button class="pixel-btn magenta-btn" onclick="stopJudgePresentation()">
+          ✖ EXIT PRESENTATION
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Feature Tour Bottom Subtitle Bar -->
+  <div id="tour-banner-bar" class="tour-banner-bar">
+    <span id="tour-banner-text">🎬 LIVE FEATURE TOUR RUNNING...</span>
+    <button class="pixel-btn magenta-btn" onclick="stopJudgePresentation()">STOP TOUR ✖</button>
   </div>
 
   <!-- Scripts -->

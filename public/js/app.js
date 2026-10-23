@@ -1247,3 +1247,186 @@ window.closeModal = function () {
   const backdrop = document.getElementById('global-modal-backdrop');
   if (backdrop) backdrop.classList.remove('open');
 };
+
+/* ==========================================================================
+   BLACK CRT JUDGE PRESENTATION & AUTOMATED LIVE FEATURE SHOWCASE
+   ========================================================================== */
+let presentationTimers = [];
+let presentationActive = false;
+
+function clearPresentationTimers() {
+  presentationTimers.forEach((t) => clearTimeout(t));
+  presentationTimers = [];
+  document.querySelectorAll('.tour-spotlight').forEach((el) => el.classList.remove('tour-spotlight'));
+}
+
+function typewriteYellowCRT(text, speedMs = 34, onComplete) {
+  const textEl = document.getElementById('crt-typewriter-text');
+  if (!textEl) return;
+  textEl.textContent = '';
+
+  let idx = 0;
+  function step() {
+    if (!presentationActive) return;
+    if (idx < text.length) {
+      const ch = text[idx];
+      textEl.textContent += ch;
+      if (ch !== ' ' && ch !== '\n' && idx % 2 === 0) {
+        window.soundEngine.playTypeBlip(idx);
+      }
+      idx++;
+      const delay = ch === '\n' ? speedMs * 4 : ch === '.' || ch === '!' ? speedMs * 3 : speedMs;
+      presentationTimers.push(setTimeout(step, delay));
+    } else if (onComplete) {
+      presentationTimers.push(setTimeout(onComplete, 1800));
+    }
+  }
+  step();
+}
+
+window.startJudgePresentation = function () {
+  clearPresentationTimers();
+  presentationActive = true;
+  closeModal();
+
+  const overlay = document.getElementById('crt-intro-overlay');
+  const badge = document.getElementById('crt-stage-badge');
+  const counter = document.getElementById('crt-scene-counter');
+  const tourBar = document.getElementById('tour-banner-bar');
+
+  if (tourBar) tourBar.classList.remove('active');
+  if (overlay) overlay.classList.add('active');
+
+  // SCENE 1: THE PROBLEM ON BLACK CRT
+  if (counter) counter.textContent = 'SCENE 01 / 02 // PROBLEM STATEMENT';
+  if (badge) badge.textContent = '⚠️ THE PROBLEM: WHY STUDENTS STRUGGLE TODAY';
+
+  const problemScript =
+    '> INITIALIZING CAMPUS DIAGNOSTIC...\n\n' +
+    '1. BORING, LIFELESS PORTALS: Traditional educational websites feel cold, stressful, and exhausting to use.\n' +
+    '2. STUCK ON TOUGH PROBLEMS: Students get stuck on Physics, Math, or Coding at home with no instant visual explanation.\n' +
+    '3. DELAYED TEACHER HELP: Reaching teachers or booking 1-on-1 help takes days of back-and-forth emails.\n' +
+    '4. CROWDED BREAK ARENAS: Indoor & outdoor gaming seats fill up before class even ends!';
+
+  typewriteYellowCRT(problemScript, 28, () => {
+    // SCENE 2: THE AI & RETRO LOUNGE SOLUTION ON BLACK CRT
+    if (!presentationActive) return;
+    window.soundEngine.playSuccess();
+    if (counter) counter.textContent = 'SCENE 02 / 02 // OUR AI-POWERED SOLUTION';
+    if (badge) badge.textContent = '💡 THE SOLUTION: NEON PIXEL ACADEMY + GEMINI AI';
+
+    const solutionScript =
+      '> DEPLOYING NEON PIXEL ACADEMY (v2.6)...\n\n' +
+      '★ RELAXING NAVY & CYAN RETRO LOUNGE: Every click sparks 8-bit chiptune sounds, neon bursts, and chill synthwave audio.\n' +
+      '★ SECURE GEMINI AI TUTOR (/api/gemini): Answers ANY general or academic question & draws live visual solution diagrams!\n' +
+      '★ 1-CLICK TEACHER SOS & BOOKING: Ping teachers in one click or book office hours.\n' +
+      '★ PRE-BOOK GAMING SEATS: Lock in indoor/outdoor game seats before the class bell rings!';
+
+    typewriteYellowCRT(solutionScript, 26, () => {
+      if (!presentationActive) return;
+      skipToLiveFeatureTour();
+    });
+  });
+};
+
+window.skipToLiveFeatureTour = function () {
+  clearPresentationTimers();
+  presentationActive = true;
+
+  const overlay = document.getElementById('crt-intro-overlay');
+  const tourBar = document.getElementById('tour-banner-bar');
+  const tourText = document.getElementById('tour-banner-text');
+
+  if (overlay) overlay.classList.remove('active');
+  if (tourBar) tourBar.classList.add('active');
+  window.soundEngine.playSuccess();
+
+  const tourSteps = [
+    {
+      delay: 200,
+      selector: '.hero-banner',
+      caption: '🎬 [1/6] RETRO NAVY & CYAN HERO SANCTUARY: 16-Bit Pixel Art Problem -> AI -> Mastery Workflow & Lo-Fi Synthwave!',
+      action: () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+    },
+    {
+      delay: 4200,
+      selector: '#ai-workspace-section',
+      caption: '🤖 [2/6] SECURE GEMINI AI (/api/gemini): Answering ANY general or study question + Live Visual Force Vector Diagram!',
+      action: () => {
+        document.getElementById('ai-workspace-section').scrollIntoView({ behavior: 'smooth' });
+        fillPresetPrompt('Explain Newtons Second Law with a 5kg block and 20N force vector solution', 'Physics', 'solve');
+      },
+    },
+    {
+      delay: 9000,
+      selector: '#teacher-section',
+      caption: '🚨 [3/6] TEACHER COMMAND CENTER: 1-Click SOS Beacon for instant help & 1-on-1 Appointment Booking!',
+      action: () => {
+        document.getElementById('teacher-section').scrollIntoView({ behavior: 'smooth' });
+      },
+    },
+    {
+      delay: 13200,
+      selector: '#library-section',
+      caption: '📚 [4/6] ARCADE KNOWLEDGE VAULT: Subject Categories, Study Notes, Illustrated PDF Books & Web Portals!',
+      action: () => {
+        document.getElementById('library-section').scrollIntoView({ behavior: 'smooth' });
+      },
+    },
+    {
+      delay: 17200,
+      selector: '#revision-section',
+      caption: '🃏 [5/6] 3D PIXEL FLASHCARDS & BOSS QUIZ: Flip 3D solution cards and battle through revision questions!',
+      action: () => {
+        document.getElementById('revision-section').scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => flipFlashcard(), 1200);
+      },
+    },
+    {
+      delay: 21500,
+      selector: '#arena-section',
+      caption: '🏓 [6/6] GAME ARENA SEAT RADAR: Pre-book Indoor & Outdoor gaming seats BEFORE class ends!',
+      action: () => {
+        document.getElementById('arena-section').scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => {
+          clickSeatSlot('TT-B1', false);
+          confirmSeatReservation();
+        }, 1200);
+      },
+    },
+    {
+      delay: 26500,
+      selector: '#events-section',
+      caption: '🏆 PRESENTATION COMPLETE! Join Campus Quests in 1 Click — Ready for Judge Q&A!',
+      action: () => {
+        document.getElementById('events-section').scrollIntoView({ behavior: 'smooth' });
+        window.soundEngine.playSuccess();
+      },
+    },
+  ];
+
+  tourSteps.forEach((step) => {
+    presentationTimers.push(
+      setTimeout(() => {
+        if (!presentationActive) return;
+        document.querySelectorAll('.tour-spotlight').forEach((el) => el.classList.remove('tour-spotlight'));
+        const target = document.querySelector(step.selector);
+        if (target) target.classList.add('tour-spotlight');
+        if (tourText) tourText.textContent = step.caption;
+        window.soundEngine.playTypeBlip(1);
+        if (step.action) step.action();
+      }, step.delay)
+    );
+  });
+};
+
+window.stopJudgePresentation = function () {
+  presentationActive = false;
+  clearPresentationTimers();
+  const overlay = document.getElementById('crt-intro-overlay');
+  const tourBar = document.getElementById('tour-banner-bar');
+  if (overlay) overlay.classList.remove('active');
+  if (tourBar) tourBar.classList.remove('active');
+};

@@ -51,6 +51,13 @@ class RetroSoundEngine {
     this.playTone(880.00, 'triangle', 0.075, 0.06, 0.03); // A5
   }
 
+  playTypeBlip(charIndex = 0) {
+    // Cute retro RPG/Animal-Crossing style high-pitched pixel typewriter blip
+    const pitches = [680, 740, 810, 720, 860, 780];
+    const freq = pitches[charIndex % pitches.length];
+    this.playTone(freq, 'square', 0.032, 0.045, 0);
+  }
+
   playFlip() {
     this.playTone(440, 'triangle', 0.06, 0.08, 0);
     this.playTone(659.25, 'sine', 0.09, 0.08, 0.04);

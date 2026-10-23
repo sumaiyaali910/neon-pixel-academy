@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JUDGE PITCH VIDEO STUDIO & MP4 RECORDER // NEON PIXEL ACADEMY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600;700&family=VT323&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy-deep: #050a18;
+      --navy-card: #101b3b;
+      --cyan: #00f5d4;
+      --yellow: #ffe66d;
+      --magenta: #ff2a85;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--navy-deep);
+      color: #e6f4ff;
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      min-height: 100vh;
+    }
+    .studio-header {
+      max-width: 1120px;
+      width: 100%;
+      background: var(--navy-card);
+      border: 2px solid var(--cyan);
+      box-shadow: 0 0 18px rgba(0, 245, 212, 0.35);
+      padding: 0.75rem 1.15rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+    .studio-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.72rem;
+      color: var(--yellow);
+      text-shadow: 0 0 8px rgba(255, 230, 109, 0.6);
+    }
+    .btn-row {
+      display: flex;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+    }
+    .p-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.55rem;
+      padding: 0.5rem 0.85rem;
+      background: #17264f;
+      color: var(--cyan);
+      border: 2px solid var(--cyan);
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #000;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .p-btn:hover {
+      background: var(--cyan);
+      color: #050a18;
+    }
+    .p-btn.yellow {
+      color: var(--yellow);
+      border-color: var(--yellow);
+    }
+    .p-btn.yellow:hover {
+      background: var(--yellow);
+      color: #050a18;
+    }
+    .p-btn.pink {
+      color: #fff;
+      border-color: var(--magenta);
+      background: rgba(255, 42, 133, 0.25);
+    }
+    .canvas-wrap {
+      position: relative;
+      max-width: 1120px;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 3px solid var(--yellow);
+      box-shadow: 0 0 28px rgba(255, 230, 109, 0.4), 8px 8px 0 #000;
+      background: #020307;
+      overflow: hidden;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .status-bar {
+      max-width: 1120px;
+      width: 100%;
+      margin-top: 0.65rem;
+      font-family: 'VT323', monospace;
+      font-size: 1.15rem;
+      color: var(--cyan);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="studio-header">
+    <div>
+      <div class="studio-title">🎬 NEON PIXEL ACADEMY // JUDGE PRESENTATION VIDEO PLAYER & RECORDER</div>
+      <div style="font-family:'VT323',monospace;font-size:1.05rem;color:#93b0d8;margin-top:0.2rem;">
+        Includes Black CRT Yellow Pixel Typewriter (Problem & AI Solution) + Cute Typing SFX + Full Website Feature Screen Recording
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="p-btn yellow" onclick="startPitchShow(false)">▶ PLAY PRESENTATION WITH AUDIO</button>
+      <button id="rec-btn" class="p-btn pink" onclick="startPitchShow(true)">🔴 RECORD & DOWNLOAD VIDEO</button>
+      <a href="/assets/neon_pixel_academy_judge_pitch.mp4" download class="p-btn">⬇ DOWNLOAD PRE-RENDERED MP4</a>
+      <a href="/" class="p-btn">🕹️ BACK TO WEBSITE</a>
+    </div>
+  </header>
+
+  <div class="canvas-wrap">
+    <canvas id="pitchCanvas" width="1280" height="720"></canvas>
+  </div>
+
+  <div class="status-bar">
+    <span id="statusText">Press "▶ PLAY PRESENTATION WITH AUDIO" to watch with cute 8-bit typewriter sounds!</span>
+    <span id="timerText">SCENE: READY</span>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('pitchCanvas');
+    const ctx = canvas.getContext('2d');
+    const statusText = document.getElementById('statusText');
+    const timerText = document.getElementById('timerText');
+
+    // Load Hero Pixel Art Image for the Website Showcase scenes
+    const heroImg = new Image();
+    heroImg.src = '/assets/retro_solution_hero.jpg';
+
+    let audioCtx = null;
+    let audioDest = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let animFrame = null;
+    let startTime = 0;
+    let lastBlipIndex = -1;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AC();
+        audioDest = audioCtx.createMediaStreamDestination();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playCuteTypeBlip(idx) {
+      if (!audioCtx) return;
+      const pitches = [720, 790, 860, 760, 910, 820];
+      const freq = pitches[idx % pitches.length];
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(0.055, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      if (audioDest) gain.connect(audioDest);
+      osc.start(now);
+      osc.stop(now + 0.038);
+    }
+
+    function playChime() {
+      if (!audioCtx) return;
+      [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+        const now = audioCtx.currentTime + i * 0.07;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(f, now);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        if (audioDest) gain.connect(audioDest);
+        osc.start(now);
+        osc.stop(now + 0.15);
+      });
+    }
+
+    const SCENES = [
+      {
+        duration: 8.5,
+        mode: 'crt',
+        header: 'SCENE 01 / 06 // DIAGNOSTIC TERMINAL [CRT-9000]',
+        badge: '⚠️ THE PROBLEM: WHY STUDENTS STRUGGLE WITH BORING PORTALS',
+        lines: [
+          '> SCANNING TRADITIONAL EDUCATIONAL WEBSITES...',
+          '',
+          '1. BORING & STRESSFUL UI: Standard portals look lifeless and drain motivation.',
+          '2. STUCK ON PROBLEMS ALONE: No instant visual explanations when studying at night.',
+          '3. SLOW TEACHER ACCESS: Days of waiting just to ask a question or book a slot.',
+          '4. FULL GAMING ZONES: Campus indoor/outdoor game seats fill up before class ends!'
+        ]
+      },
+      {
+        duration: 9.0,
+        mode: 'crt',
+        header: 'SCENE 02 / 06 // AI ARCHITECTURE & SOLUTION [CRT-9000]',
+        badge: '💡 THE SOLUTION: NEON PIXEL ACADEMY + SECURE GEMINI AI',
+        lines: [
+          '> INITIALIZING NEON PIXEL ACADEMY (NAVY & CYAN RETRO LOUNGE)...',
+          '',
+          '★ RELAXING 16-BIT VIBE: Every click sparks chiptune SFX, neon bursts & lo-fi synth!',
+          '★ SECURE GEMINI AI (/api/gemini): Reads process.env.GEMINI_API_KEY on the backend.',
+          '★ ANSWERS ANYTHING + VISUAL DIAGRAMS: Solves any general or academic problem!',
+          '★ 1-CLICK TEACHER SOS & SEAT RADAR: Reach teachers or book game seats before the bell!'
+        ]
+      },
+      {
+        duration: 6.5,
+        mode: 'ui_hero_ai',
+        header: 'SCENE 03 / 06 // LIVE SCREEN RECORDING: HERO & GEMINI AI TERMINAL',
+        subtitle: 'Asking Gemini AI a Physics Force Problem -> Live Step-by-Step Solution & Force Diagram!'
+      },
+      {
+        duration: 6.0,
+        mode: 'ui_teachers_library',
+        header: 'SCENE 04 / 06 // LIVE SCREEN RECORDING: 1-CLICK TEACHER SOS & NOTES VAULT',
+        subtitle: 'Pinging Prof. Aria Vance via 1-Click SOS Beacon + Opening Study Notes, PDFs & Web Portals!'
+      },
+      {
+        duration: 6.0,
+        mode: 'ui_flashcards_arena',
+        header: 'SCENE 05 / 06 // LIVE SCREEN RECORDING: 3D FLASHCARDS & GAME SEAT PRE-BOOKING',
+        subtitle: 'Flipping 3D Neon Flashcards + Pre-Booking Indoor Table Tennis Seat Before Class Ends!'
+      },
+      {
+        duration: 4.5,
+        mode: 'crt',
+        header: 'SCENE 06 / 06 // JUDGE PRESENTATION COMPLETE',
+        badge: '🏆 NEON PIXEL ACADEMY // READY FOR JUDGE Q&A!',
+        lines: [
+          '> ALL MODULES VERIFIED & LIVE ON VERCEL!',
+          '',
+          '✔ Retro Navy Blue (#0a1128) & Electric Cyan (#00f5d4) Pixel Theme',
+          '✔ Secure /api/gemini Route (process.env.GEMINI_API_KEY)',
+          '✔ General & Academic AI + Visual Solution Diagrams',
+          '✔ 1-Click Teacher SOS, Notes/PDFs, 3D Flashcards & Game Seat Pre-Booking!'
+        ]
+      }
+    ];
+
+    function drawCRTScanlines() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+      for (let y = 0; y < canvas.height; y += 4) {
+        ctx.fillRect(0, y, canvas.width, 2);
+      }
+    }
+
+    function drawCRTScene(scene, localT) {
+      // Black CRT Background
+      ctx.fillStyle = '#020307';
+      ctx.fillRect(0, 0, 1280, 720);
+
+      // Subtle CRT Bezel
+      ctx.strokeStyle = '#ffd166';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(36, 32, 1208, 656);
+
+      // Header
+      ctx.fillStyle = '#ffd166';
+      ctx.font = '16px "Press Start 2P", monospace';
+      ctx.fillText(scene.header, 68, 78);
+      ctx.fillRect(68, 94, 1144, 2);
+
+      // Badge
+      ctx.fillStyle = 'rgba(255, 209, 102, 0.14)';
+      ctx.fillRect(68, 122, 980, 44);
+      ctx.strokeStyle = '#ffd166';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(68, 122, 980, 44);
+      ctx.fillStyle = '#ffe66d';
+      ctx.font = '15px "Press Start 2P", monospace';
+      ctx.fillText(scene.badge, 86, 151);
+
+      // Typewriter Text Calculation
+      const fullText = scene.lines.join('\n');
+      const typeDuration = scene.duration - 1.6;
+      const progress = Math.min(1, localT / typeDuration);
+      const charCount = Math.floor(fullText.length * progress);
+
+      if (charCount > lastBlipIndex && charCount < fullText.length && charCount % 2 === 0) {
+        lastBlipIndex = charCount;
+        playCuteTypeBlip(charCount);
+      }
+
+      const visibleText = fullText.slice(0, charCount);
+      const visibleLines = visibleText.split('\n');
+
+      ctx.fillStyle = '#ffe66d';
+      ctx.shadowColor = 'rgba(255, 230, 109, 0.75)';
+      ctx.shadowBlur = 10;
+      ctx.font = '16px "Press Start 2P", monospace';
+
+      let y = 218;
+      visibleLines.forEach((line, i) => {
+        ctx.fillText(line, 68, y);
+        if (i === visibleLines.length - 1) {
+          const w = ctx.measureText(line).width;
+          if (Math.floor(localT * 3) % 2 === 0) {
+            ctx.fillRect(68 + w + 8, y - 18, 14, 22);
+          }
+        }
+        y += 52;
+      });
+      ctx.shadowBlur = 0;
+
+      drawCRTScanlines();
+    }
+
+    function drawTopHudMock(xpVal, bellStr) {
+      ctx.fillStyle = '#050a18';
+      ctx.fillRect(0, 0, 1280, 56);
+      ctx.fillStyle = '#00f5d4';
+      ctx.fillRect(0, 54, 1280, 3);
+
+      ctx.font = '14px "Press Start 2P", monospace';
+      ctx.fillStyle = '#00f5d4';
+      ctx.fillText('🦉 NEON PIXEL ACADEMY // NAVY & CYAN AI LOUNGE', 36, 35);
+
+      ctx.fillStyle = '#ffd166';
+      ctx.fillText(`⭐ ${xpVal} XP   🔔 BELL: ${bellStr}`, 860, 35);
+    }
+
+    function drawUIHeroAIScene(scene, localT) {
+      ctx.fillStyle = '#0a1128';
+      ctx.fillRect(0, 0, 1280, 720);
+      drawTopHudMock(1285, '14:12');
+
+      // Hero Banner Box
+      ctx.fillStyle = '#101b3b';
+      ctx.strokeStyle = '#00f5d4';
+      ctx.lineWidth = 2;
+      ctx.fillRect(36, 74, 1208, 175);
+      ctx.strokeRect(36, 74, 1208, 175);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '15px "Press Start 2P", monospace';
+      ctx.fillText('LEVEL UP YOUR BRAIN IN OUR NAVY & CYAN PIXEL SANCTUARY', 58, 114);
+      ctx.fillStyle = '#93b0d8';
+      ctx.font = '18px "Space Grotesk", sans-serif';
+      ctx.fillText('8-Bit Chiptune Click SFX • Neon Bursts • General & Academic Gemini AI • Seat Pre-Booking', 58, 148);
+
+      if (heroImg.complete && heroImg.naturalWidth > 0) {
+        ctx.drawImage(heroImg, 910, 86, 315, 150);
+      }
+
+      // Left Box: Gemini AI Terminal
+      ctx.fillStyle = '#050a18';
+      ctx.strokeStyle = '#00f5d4';
+      ctx.fillRect(36, 268, 690, 365);
+      ctx.strokeRect(36, 268, 690, 365);
+
+      ctx.fillStyle = '#17264f';
+      ctx.fillRect(38, 270, 686, 36);
+      ctx.fillStyle = '#00f5d4';
+      ctx.font = '12px "Press Start 2P", monospace';
+      ctx.fillText('🦉 PIXEL-OWL 9000 // SECURE POST /api/gemini CLIENT', 54, 294);
+
+      const promptStr = 'Explain Newtons Second Law with a 5kg block and 20N force vector';
+      const typedLen = Math.min(promptStr.length, Math.floor((localT / 1.8) * promptStr.length));
+      if (typedLen > lastBlipIndex && typedLen < promptStr.length) {
+        lastBlipIndex = typedLen;
+        playCuteTypeBlip(typedLen);
+      }
+
+      ctx.fillStyle = '#101b3b';
+      ctx.fillRect(54, 322, 650, 38);
+      ctx.strokeStyle = '#00f5d4';
+      ctx.strokeRect(54, 322, 650, 38);
+      ctx.fillStyle = '#ffe66d';
+      ctx.font = '15px monospace';
+      ctx.fillText('> ' + promptStr.slice(0, typedLen), 66, 346);
+
+      if (localT > 1.9) {
+        ctx.fillStyle = 'rgba(16,27,59,0.95)';
+        ctx.fillRect(54, 376, 650, 235);
+        ctx.strokeStyle = '#ffd166';
+        ctx.strokeRect(54, 376, 650, 235);
+
+        ctx.fillStyle = '#00f5d4';
+        ctx.font = '13px "Press Start 2P", monospace';
+        ctx.fillText('🦉 GEMINI AI SOLUTION (process.env.GEMINI_API_KEY):', 70, 408);
+
+        ctx.fillStyle = '#e6f4ff';
+        ctx.font = '16px "Space Grotesk", sans-serif';
+        ctx.fillText('1. Free-Body Diagram: Isolate the 5 kg mass & net horizontal force.', 70, 445);
+        ctx.fillText('2. Apply Formula: F_net = m × a  ==>  20 N = 5 kg × a', 70, 480);
+        ctx.fillStyle = '#06d6a0';
+        ctx.fillText('3. Verified Result: Acceleration a = 20 / 5 = 4 m/s² (Solved +35 XP!)', 70, 515);
+        ctx.fillStyle = '#ffe66d';
+        ctx.fillText('★ Also answers ANY general question (Black holes, coding, jokes, trivia)!', 70, 555);
+      }
+
+      // Right Box: Visual Solution Hologram
+      ctx.fillStyle = '#050a18';
+      ctx.strokeStyle = '#00f5d4';
+      ctx.fillRect(746, 268, 498, 365);
+      ctx.strokeRect(746, 268, 498, 365);
+      ctx.fillStyle = '#ffd166';
+      ctx.font = '12px "Press Start 2P", monospace';
+      ctx.fillText('📐 VISUAL SOLUTION HOLOGRAM', 768, 302);
+
+      // Draw Force Vector Block
+      ctx.fillStyle = '#101b3b';
+      ctx.strokeStyle = '#00f5d4';
+      ctx.lineWidth = 3;
+      ctx.fillRect(910, 410, 120, 80);
+      ctx.strokeRect(910, 410, 120, 80);
+      ctx.fillStyle = '#00f5d4';
+      ctx.font = '16px monospace';
+      ctx.fillText('m = 5 kg', 932, 455);
+
+      // Force Arrow
+      ctx.strokeStyle = '#00f5d4';
+      ctx.beginPath();
+      ctx.moveTo(1030, 450);
+      ctx.lineTo(1170, 450);
+      ctx.stroke();
+      ctx.fillStyle = '#00f5d4';
+      ctx.fillText('F = 20 N ➔', 1055, 435);
+      ctx.fillStyle = '#06d6a0';
+      ctx.fillText('RESULT: a = 4 m/s²', 895, 545);
+
+      drawBottomBanner(scene.subtitle);
+      drawCRTScanlines();
+    }
+
+    function drawUITeachersLibraryScene(scene, localT) {
+      ctx.fillStyle = '#0a1128';
+      ctx.fillRect(0, 0, 1280, 720);
+      drawTopHudMock(1350, '13:45');
+
+      // Section 02: Teacher Command Center
+      ctx.fillStyle = '#00f5d4';
+      ctx.font = '14px "Press Start 2P", monospace';
+      ctx.fillText('02 // TEACHER COMMAND CENTER (1-CLICK SOS & APPOINTMENTS)', 36, 92);
+
+      const teachers = [
+        { name: 'Prof. Aria Vance', sub: 'Physics • Lab 404', status: 'ONLINE • SOS READY' },
+        { name: 'Dr. Kenji Takahashi', sub: 'Computer Science • Deck 202', status: 'ONLINE • DEBUGGING' },
+        { name: 'Prof. Elena Rostova', sub: 'Mathematics • Suite 108', status: 'ONLINE • SOS READY' }
+      ];
+
+      teachers.forEach((t, i) => {
+        const x = 36 + i * 412;
+        ctx.fillStyle = '#101b3b';
+        ctx.strokeStyle = i === 0 && localT > 1.2 ? '#ff2a85' : '#00f5d4';
+        ctx.lineWidth = 2;
+        ctx.fillRect(x, 112, 384, 185);
+        ctx.strokeRect(x, 112, 384, 185);
+
+        ctx.fillStyle = '#06d6a0';
+        ctx.font = '14px monospace';
+        ctx.fillText('● ' + t.status, x + 20, 142);
+        ctx.fillStyle = '#fff';
+        ctx.font = '16px "Press Start 2P", monospace';
+        ctx.fillText(t.name, x + 20, 175);
+        ctx.fillStyle = '#00f5d4';
+        ctx.font = '16px "Space Grotesk", sans-serif';
+        ctx.fillText(t.sub, x + 20, 205);
+
+        // Buttons
+        ctx.fillStyle = '#ff2a85';
+        ctx.fillRect(x + 20, 232, 165, 42);
+        ctx.fillStyle = '#fff';
+        ctx.font = '11px "Press Start 2P", monospace';
+        ctx.fillText('🚨 1-CLICK SOS', x + 32, 258);
+
+        ctx.fillStyle = '#17264f';
+        ctx.strokeStyle = '#00f5d4';
+        ctx.fillRect(x + 198, 232, 165, 42);
+        ctx.strokeRect(x + 198, 232, 165, 42);
+        ctx.fillStyle = '#00f5d4';
+        ctx.fillText('📅 BOOK SLOT', x + 214, 258);
+      });
+
+      // Section 03: Knowledge Vault (Notes, PDFs, Websites)
+      ctx.fillStyle = '#00f5d4';
+      ctx.font = '14px "Press Start 2P", monospace';
+      ctx.fillText('03 // ARCADE KNOWLEDGE VAULT (STUDY NOTES, PDF BOOKS & WEBSITES)', 36, 345);
+
+      const resources = [
+        { tag: '📓 STUDY NOTES', title: 'Newtonian Mechanics & Vectors Cheat Sheet', col: '#00f5d4' },
+        { tag: '📘 PDF TEXTBOOK', title: 'Retro Illustrated Guide to Quantum Physics', col: '#ffd166' },
+        { tag: '🌐 WEB SIMULATOR', title: 'PhET & VisuAlgo Interactive Lab Portals', col: '#06d6a0' }
+      ];
+
+      resources.forEach((r, i) => {
+        const x = 36 + i * 412;
+        ctx.fillStyle = '#101b3b';
+        ctx.strokeStyle = r.col;
+        ctx.fillRect(x, 365, 384, 240);
+        ctx.strokeRect(x, 365, 384, 240);
+
+        ctx.fillStyle = r.col;
+        ctx.font = '12px "Press Start 2P", monospace';
+        ctx.fillText(r.tag, x + 20, 402);
+
+        ctx.fillStyle = '#fff';
+        ctx.font = '18px "Space Grotesk", sans-serif';
+        ctx.fillText(r.title, x + 20, 445);
+        ctx.fillStyle = '#93b0d8';
+        ctx.fillText('Filtered by Subject Category • Instant Reader & AI Summary', x + 20, 485);
+
+        ctx.fillStyle = '#17264f';
+        ctx.fillRect(x + 20, 535, 180, 42);
+        ctx.strokeRect(x + 20, 535, 180, 42);
+        ctx.fillStyle = r.col;
+        ctx.font = '11px "Press Start 2P", monospace';
+        ctx.fillText('OPEN RESOURCE ↗', x + 32, 562);
+      });
+
+      drawBottomBanner(scene.subtitle);
+      drawCRTScanlines();
+    }
+
+    function drawUIFlashcardsArenaScene(scene, localT) {
+      ctx.fillStyle = '#0a1128';
+      ctx.fillRect(0, 0, 1280, 720);
+      drawTopHudMock(1460, '13:10');
+
+      // Left: 3D Flashcards & Revision Quiz
+      ctx.fillStyle = '#00f5d4';
+      ctx.font = '13px "Press Start 2P", monospace';
+      ctx.fillText('04 // 3D PIXEL FLASHCARDS & QUIZ', 36, 92);
+
+      const isFlipped = localT > 2.2;
+      ctx.fillStyle = '#101b3b';
+      ctx.strokeStyle = isFlipped ? '#ffd166' : '#00f5d4';
+      ctx.lineWidth = 3;
+      ctx.fillRect(36, 112, 575, 230);
+      ctx.strokeRect(36, 112, 575, 230);
+
+      ctx.fillStyle = isFlipped ? '#ffd166' : '#00f5d4';
+      ctx.font = '13px "Press Start 2P", monospace';
+      ctx.fillText(isFlipped ? '✨ 3D FLASHCARD FLIPPED // VERIFIED SOLUTION' : '🃏 3D FLASHCARD // CLICK TO FLIP', 62, 152);
+
+      ctx.fillStyle = '#fff';
+      ctx.font = '19px "Space Grotesk", sans-serif';
+      if (!isFlipped) {
+        ctx.fillText('Q: What is the time complexity of Binary Search on N items?', 62, 210);
+      } else {
+        ctx.fillText('A: O(log₂ N) — halves the search space on every step!', 62, 210);
+      }
+
+      // Arcade Boss Quiz Box below Flashcard
+      ctx.fillStyle = '#050a18';
+      ctx.strokeStyle = '#ff2a85';
+      ctx.fillRect(36, 362, 575, 255);
+      ctx.strokeRect(36, 362, 575, 255);
+      ctx.fillStyle = '#ffd166';
+      ctx.font = '12px "Press Start 2P", monospace';
+      ctx.fillText('👾 CYBER-QUIZ DEFENDER // WAVE 1/5   SCORE: 200', 58, 398);
+      ctx.fillStyle = '#fff';
+      ctx.font = '17px "Space Grotesk", sans-serif';
+      ctx.fillText('A 4 kg drone has 24 N net cyan thrust. Acceleration?', 58, 442);
+      ctx.fillStyle = '#06d6a0';
+      ctx.fillRect(58, 475, 240, 48);
+      ctx.fillStyle = '#050a18';
+      ctx.font = '13px "Press Start 2P", monospace';
+      ctx.fillText('✓ 6 m/s² (+50 XP)', 76, 505);
+
+      // Right: Indoor & Outdoor Game Seat Radar
+      ctx.fillStyle = '#00f5d4';
+      ctx.font = '13px "Press Start 2P", monospace';
+      ctx.fillText('05 // PRE-BOOK GAME SEAT BEFORE CLASS ENDS!', 646, 92);
+
+      ctx.fillStyle = '#101b3b';
+      ctx.strokeStyle = '#00f5d4';
+      ctx.fillRect(646, 112, 598, 505);
+      ctx.strokeRect(646, 112, 598, 505);
+
+      ctx.fillStyle = '#ffd166';
+      ctx.font = '13px "Press Start 2P", monospace';
+      ctx.fillText('🏓 INDOOR & OUTDOOR ARENA SEAT MAP', 672, 150);
+      ctx.fillStyle = '#93b0d8';
+      ctx.font = '16px "Space Grotesk", sans-serif';
+      ctx.fillText(' Zones: Table Tennis • VR/PS5 Lounge • 5v5 Futsal • 3v3 Basketball', 672, 182);
+
+      const slots = [
+        { id: 'TT-A1', st: 'OCCUPIED', col: '#ff2a85' },
+        { id: 'TT-A2', st: 'OCCUPIED', col: '#ff2a85' },
+        { id: 'TT-B1', st: localT > 2.8 ? 'RESERVED ✓' : 'OPEN SLOT', col: localT > 2.8 ? '#06d6a0' : '#00f5d4' },
+        { id: 'TT-B2', st: 'OPEN SLOT', col: '#00f5d4' },
+        { id: 'VR-01', st: 'OCCUPIED', col: '#ff2a85' },
+        { id: 'VR-02', st: 'OPEN SLOT', col: '#00f5d4' },
+        { id: 'FT-01', st: 'OPEN SLOT', col: '#00f5d4' },
+        { id: 'BB-01', st: 'RESERVED ✓', col: '#06d6a0' }
+      ];
+
+      slots.forEach((s, idx) => {
+        const col = idx % 4;
+        const row = Math.floor(idx / 4);
+        const sx = 672 + col * 138;
+        const sy = 215 + row * 110;
+        ctx.fillStyle = '#050a18';
+        ctx.strokeStyle = s.col;
+        ctx.lineWidth = 2;
+        ctx.fillRect(sx, sy, 126, 92);
+        ctx.strokeRect(sx, sy, 126, 92);
+
+        ctx.fillStyle = s.col;
+        ctx.font = '13px "Press Start 2P", monospace';
+        ctx.fillText(s.id, sx + 22, sy + 38);
+        ctx.font = '14px monospace';
+        ctx.fillText(s.st, sx + 16, sy + 68);
+      });
+
+      ctx.fillStyle = '#ffd166';
+      ctx.fillRect(672, 465, 542, 54);
+      ctx.fillStyle = '#050a18';
+      ctx.font = '13px "Press Start 2P", monospace';
+      ctx.fillText('🎟️ SEAT TT-B1 LOCKED IN FOR 12:30 PM BREAK!', 696, 498);
+
+      drawBottomBanner(scene.subtitle);
+      drawCRTScanlines();
+    }
+
+    function drawBottomBanner(text) {
+      ctx.fillStyle = '#020307';
+      ctx.fillRect(36, 650, 1208, 52);
+      ctx.strokeStyle = '#ffe66d';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(36, 650, 1208, 52);
+
+      ctx.fillStyle = '#ffe66d';
+      ctx.font = '13px "Press Start 2P", monospace';
+      ctx.fillText('🎬 ' + text, 56, 682);
+    }
+
+    let currentSceneIdx = -1;
+
+    function renderLoop(now) {
+      const elapsed = (now - startTime) / 1000;
+      let acc = 0;
+      let activeIdx = -1;
+      let localT = 0;
+
+      for (let i = 0; i < SCENES.length; i++) {
+        if (elapsed >= acc && elapsed < acc + SCENES[i].duration) {
+          activeIdx = i;
+          localT = elapsed - acc;
+          break;
+        }
+        acc += SCENES[i].duration;
+      }
+
+      if (activeIdx === -1) {
+        // Presentation finished
+        timerText.textContent = 'PRESENTATION COMPLETE!';
+        statusText.textContent = '✅ Judge Presentation Finished! Click Play to watch again or Download the MP4.';
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+          mediaRecorder.stop();
+        }
+        return;
+      }
+
+      if (activeIdx !== currentSceneIdx) {
+        currentSceneIdx = activeIdx;
+        lastBlipIndex = -1;
+        playChime();
+      }
+
+      const scene = SCENES[activeIdx];
+      timerText.textContent = `SCENE ${activeIdx + 1}/${SCENES.length} • ${elapsed.toFixed(1)}s`;
+
+      if (scene.mode === 'crt') {
+        drawCRTScene(scene, localT);
+      } else if (scene.mode === 'ui_hero_ai') {
+        drawUIHeroAIScene(scene, localT);
+      } else if (scene.mode === 'ui_teachers_library') {
+        drawUITeachersLibraryScene(scene, localT);
+      } else if (scene.mode === 'ui_flashcards_arena') {
+        drawUIFlashcardsArenaScene(scene, localT);
+      }
+
+      animFrame = requestAnimationFrame(renderLoop);
+    }
+
+    window.startPitchShow = function (recordVideo = false) {
+      if (animFrame) cancelAnimationFrame(animFrame);
+      initAudio();
+      currentSceneIdx = -1;
+      lastBlipIndex = -1;
+      startTime = performance.now();
+
+      if (recordVideo) {
+        recordedChunks = [];
+        const canvasStream = canvas.captureStream(30);
+        const combinedTracks = [
+          ...canvasStream.getVideoTracks(),
+          ...(audioDest ? audioDest.stream.getAudioTracks() : [])
+        ];
+        const combinedStream = new MediaStream(combinedTracks);
+        mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+        };
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'neon_pixel_academy_judge_presentation.webm';
+          a.click();
+          statusText.textContent = '🎉 Video downloaded to your computer!';
+        };
+        mediaRecorder.start();
+        statusText.textContent = '🔴 Recording Judge Pitch Video + Cute 8-Bit Audio...';
+      } else {
+        statusText.textContent = '▶ Playing Judge Presentation with Cute 8-Bit Typewriter Audio...';
+      }
+
+      animFrame = requestAnimationFrame(renderLoop);
+    };
+
+    // Draw initial preview frame
+    window.onload = () => {
+      drawCRTScene(SCENES[0], 4.0);
+    };
+  </script>
+</body>
+</html>

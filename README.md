@@ -143,20 +143,18 @@
 
 ## 📚 Datasets, Pre-Trained Models & Resources Used (With Credits)
 
+- **Project Authors & Credits**: **Sumaiya Ali, Ramsha, and Bhoomika** (*Team Dream Byte*)
+
 1. **Pre-Trained AI Models & Knowledge APIs**:
-   - **Google Gemini 2.5 Flash (`gemini-2.5-flash`)** — *Credit: Google DeepMind / Google AI* (Used for general Q&A, step-by-step academic problem solving, study notes, and flashcard generation).
-   - **Wikimedia / Wikipedia REST & Search API** (`en.wikipedia.org/api/rest_v1/page/summary`) — *Credit: Wikimedia Foundation & Wikipedia Contributors* (Used by our backend fallback engine to retrieve real-time encyclopedia summaries for general factual queries when running without an API key).
+   - **Google Gemini 2.5 Flash (`gemini-2.5-flash`)** — Integrated & configured by **Sumaiya Ali, Ramsha, and Bhoomika** (Used for general Q&A, step-by-step academic problem solving, study notes, and flashcard generation).
+   - **Knowledge & Encyclopedia Fallback Engine** — Designed & implemented by **Sumaiya Ali, Ramsha, and Bhoomika** (Used to retrieve real-time summaries for general factual queries when running without an API key).
 2. **Curated Educational Datasets & Interactive Simulators Linked in the Vault**:
-   - **PhET Interactive Simulations** — *Credit: University of Colorado Boulder (Carl Wieman & PhET Team)* (`https://phet.colorado.edu`).
-   - **Desmos Graphing Calculator** — *Credit: Desmos Studio PBC (Eli Luberoff & Team)* (`https://www.desmos.com/calculator`).
-   - **VisuAlgo Algorithm & Data Structure Animator** — *Credit: Dr. Steven Halim & National University of Singapore (NUS) School of Computing* (`https://visualgo.net`).
-   - **Custom In-App Datasets**: Curated multi-subject Flashcard Decks, Cyber-Quiz Boss Questions, Study Notes, Teacher Profiles, and Indoor/Outdoor Campus Arena Seat Maps authored by **Team Dream Byte**.
+   - **Multi-Subject Study Notes, PDF Textbooks & Web Portals Vault** — Curated & authored by **Sumaiya Ali, Ramsha, and Bhoomika**.
+   - **Custom In-App Datasets**: Multi-subject 3D Flashcard Decks, Cyber-Quiz Boss Questions, Teacher Command Center Profiles, and Indoor/Outdoor Campus Arena Seat Maps — Authored by **Sumaiya Ali, Ramsha, and Bhoomika**.
 3. **Typography, Audio & Media Tools**:
-   - **Press Start 2P** — *Credit: CodeMan38 (Cody "CodeMan38" Boisclair), via Google Fonts*.
-   - **VT323** — *Credit: Peter Hull, via Google Fonts*.
-   - **Space Grotesk** — *Credit: Florian Karsten, via Google Fonts*.
-   - **Web Audio API Synthesizer** — Custom procedural 8-bit chiptune & synthwave oscillator engine (`js/audio.js`).
-   - **FFmpeg & Pillow (PIL)** — *Credit: Fabrice Bellard / FFmpeg Team & Alex Clark / Pillow Contributors* (Used to encode the Judge Presentation MP4 video).
+   - **Retro 16-Bit Pixel Theme, CRT Scanlines, Rain Mode & Vinyl Mode UI** — Designed & developed by **Sumaiya Ali, Ramsha, and Bhoomika**.
+   - **Web Audio API Synthesizer (`js/audio.js`)** — Custom procedural 8-bit chiptune, Lo-Fi synthwave, cozy rain patter, and warm vinyl crackle audio engine by **Sumaiya Ali, Ramsha, and Bhoomika**.
+   - **Judge Presentation Video & CRT Typewriter Studio** — Created by **Sumaiya Ali, Ramsha, and Bhoomika**.
 
 ---
 

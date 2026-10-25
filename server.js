@@ -8,6 +8,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const geminiHandler = require('./api/gemini');
+const dbHandler = require('./api/db');
 
 const PORT = process.env.PORT || 3000;
 
@@ -26,15 +27,14 @@ const MIME_TYPES = {
 async function requestListener(req, res) {
   const safeUrl = (req.url || '/').split('?')[0];
 
-  // Route /api/gemini to our serverless function handler
-  if (safeUrl === '/api/gemini') {
+  // Route /api/gemini or /api/db to our serverless function handlers
+  if (safeUrl === '/api/gemini' || safeUrl === '/api/db') {
     let rawBody = '';
     req.on('data', (chunk) => {
       rawBody += chunk.toString();
     });
     req.on('end', async () => {
       req.body = rawBody;
-      // Polyfill Express/Vercel helper methods if running on raw http.Server
       if (!res.status) {
         res.status = (code) => {
           res.statusCode = code;
@@ -47,7 +47,11 @@ async function requestListener(req, res) {
           res.end(JSON.stringify(obj));
         };
       }
-      await geminiHandler(req, res);
+      if (safeUrl === '/api/db') {
+        await dbHandler(req, res);
+      } else {
+        await geminiHandler(req, res);
+      }
     });
     return;
   }

@@ -15,7 +15,7 @@ const SUBJECT_DATA = {
   History: { label: '🏛️ History' },
 };
 
-const TEACHERS = [
+let TEACHERS = [
   {
     id: 't1',
     name: 'Prof. Aria Vance',
@@ -25,6 +25,12 @@ const TEACHERS = [
     status: 'Online • Instant SOS Ready',
     room: 'Lab 404 / Hologram Pod A',
     nextSlot: 'Today, 12:30 PM',
+    slots: [
+      { id: 't1-s1', time: 'Today, 12:30 PM', busy: false, bookedBy: null },
+      { id: 't1-s2', time: 'Today, 02:00 PM', busy: true, bookedBy: 'Zain (Extra Class)' },
+      { id: 't1-s3', time: 'Today, 04:15 PM', busy: false, bookedBy: null },
+      { id: 't1-s4', time: 'Tomorrow, 11:00 AM', busy: false, bookedBy: null },
+    ],
   },
   {
     id: 't2',
@@ -35,6 +41,11 @@ const TEACHERS = [
     status: 'Online • Debugging Live',
     room: 'Cyber Deck 202',
     nextSlot: 'Today, 01:15 PM',
+    slots: [
+      { id: 't2-s1', time: 'Today, 01:15 PM', busy: false, bookedBy: null },
+      { id: 't2-s2', time: 'Today, 03:30 PM', busy: false, bookedBy: null },
+      { id: 't2-s3', time: 'Tomorrow, 10:00 AM', busy: true, bookedBy: 'Ayesha (Algorithm Prep)' },
+    ],
   },
   {
     id: 't3',
@@ -45,6 +56,11 @@ const TEACHERS = [
     status: 'Online • Instant SOS Ready',
     room: 'Euler Suite 108',
     nextSlot: 'Today, 02:00 PM',
+    slots: [
+      { id: 't3-s1', time: 'Today, 02:00 PM', busy: false, bookedBy: null },
+      { id: 't3-s2', time: 'Today, 04:30 PM', busy: false, bookedBy: null },
+      { id: 't3-s3', time: 'Tomorrow, 12:00 PM', busy: false, bookedBy: null },
+    ],
   },
   {
     id: 't4',
@@ -55,6 +71,10 @@ const TEACHERS = [
     status: 'In Lab • SOS Priority Open',
     room: 'Alchemy Wing B',
     nextSlot: 'Today, 03:00 PM',
+    slots: [
+      { id: 't4-s1', time: 'Today, 03:00 PM', busy: false, bookedBy: null },
+      { id: 't4-s2', time: 'Tomorrow, 01:00 PM', busy: false, bookedBy: null },
+    ],
   },
   {
     id: 't5',
@@ -65,6 +85,10 @@ const TEACHERS = [
     status: 'Online • Instant SOS Ready',
     room: 'Bio-Dome 3',
     nextSlot: 'Today, 03:45 PM',
+    slots: [
+      { id: 't5-s1', time: 'Today, 03:45 PM', busy: false, bookedBy: null },
+      { id: 't5-s2', time: 'Tomorrow, 11:30 AM', busy: false, bookedBy: null },
+    ],
   },
   {
     id: 't6',
@@ -75,6 +99,10 @@ const TEACHERS = [
     status: 'Online • Instant SOS Ready',
     room: 'Chronicle Hall 12',
     nextSlot: 'Tomorrow, 10:00 AM',
+    slots: [
+      { id: 't6-s1', time: 'Tomorrow, 10:00 AM', busy: false, bookedBy: null },
+      { id: 't6-s2', time: 'Tomorrow, 02:00 PM', busy: false, bookedBy: null },
+    ],
   },
 ];
 
@@ -257,7 +285,7 @@ const ARCADE_QUESTIONS = [
   },
 ];
 
-const GAME_ZONES = [
+let GAME_ZONES = [
   {
     id: 'indoor-table-tennis',
     type: 'INDOOR',
@@ -324,7 +352,7 @@ const GAME_ZONES = [
   },
 ];
 
-const CAMPUS_EVENTS = [
+let CAMPUS_EVENTS = [
   {
     id: 'ev1',
     category: 'Hackathon',
@@ -363,7 +391,9 @@ const CAMPUS_EVENTS = [
   },
 ];
 
-// Application State
+// Application State & Persistent Database Store
+const DB_STORAGE_KEY = 'neon_pixel_academy_db_v1';
+
 let appState = {
   activeSubject: 'All',
   xp: 1250,
@@ -374,23 +404,64 @@ let appState = {
   selectedZoneId: 'indoor-table-tennis',
   selectedSeatId: null,
   reservedSeats: ['TT-D1'],
-  appointments: [],
+  appointments: [
+    {
+      id: 'bk-101',
+      studentName: 'Zain Ahmed',
+      studentRoll: 'CS-2026-042',
+      studentEmail: 'zain@campus.edu',
+      teacherId: 't1',
+      teacherName: 'Prof. Aria Vance',
+      subject: 'Physics',
+      time: 'Today, 02:00 PM',
+      topic: 'Extra Class: Force Vector Decomposition & Inclined Planes',
+      createdAt: '2026-10-25 11:15 AM',
+    },
+  ],
+  competitionParticipants: [
+    {
+      id: 'cp-201',
+      studentName: 'Sumaiya Ali',
+      studentRoll: 'AI-2026-001',
+      studentEmail: 'sumaiya@dreambyte.edu',
+      competitionId: 'ev1',
+      competitionTitle: '⚡ 24-Hour Retro AI & Robotics Game Jam',
+      category: 'Hackathon',
+      registeredAt: '2026-10-25 10:30 AM',
+    },
+  ],
+  gameReservations: [
+    {
+      id: 'gr-301',
+      studentName: 'Ramsha',
+      studentRoll: 'AI-2026-002',
+      zoneId: 'indoor-table-tennis',
+      zoneName: '🏓 Neon Table Tennis Pod',
+      seatId: 'TT-D1',
+      timeWindow: 'Right as Class Ends (In 14 Mins)',
+      reservedAt: '2026-10-25 11:20 AM',
+    },
+  ],
   chatHistory: [],
+  dbAdminTab: 'teachers',
 };
 
 /* ==========================================================================
    INITIALIZATION & GLOBAL NEON CLICK BURST
    ========================================================================== */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initGlobalNeonClickEffect();
+  await initDatabaseSync();
   renderSubjectTabs();
   renderTeachers();
+  renderAppointmentsList();
   renderLibrary();
   renderFlashcard();
   renderArcadeQuestion();
   renderGameZones();
   renderSelectedZoneSeats();
   renderCampusEvents();
+  renderDbAdminPanel();
   renderVisualSolutionHologram('physics_force', "Newton's Second Law & Force Vector Solution");
   startClassCountdownTimer();
 });
@@ -736,7 +807,7 @@ window.renderVisualSolutionHologram = function (diagramType, title) {
 };
 
 /* ==========================================================================
-   SECTION 2: TEACHERS COMMAND CENTER (1-CLICK SOS & APPOINTMENTS)
+   SECTION 2: TEACHERS COMMAND CENTER (1-CLICK SOS & EXTRA-CLASS BOOKING DB)
    ========================================================================== */
 function renderTeachers() {
   const grid = document.getElementById('teachers-grid');
@@ -748,25 +819,46 @@ function renderTeachers() {
       : TEACHERS.filter((t) => t.subject === appState.activeSubject);
 
   grid.innerHTML = filtered
-    .map(
-      (t) => `
+    .map((t) => {
+      const slots = Array.isArray(t.slots) ? t.slots : [];
+      const freeSlots = slots.filter((s) => !s.busy);
+      const nextOpen = freeSlots.length > 0 ? freeSlots[0].time : 'All Slots Busy (Edit in DB)';
+
+      const slotBadgesHtml = slots
+        .map(
+          (s) => `
+          <span style="font-family:var(--font-terminal);font-size:0.88rem;padding:0.12rem 0.45rem;border:1px solid ${
+            s.busy ? 'var(--neon-magenta)' : 'var(--cyan-primary)'
+          };color:${s.busy ? 'var(--neon-magenta)' : 'var(--cyan-primary)'};background:${
+            s.busy ? 'rgba(255,42,133,0.12)' : 'rgba(0,245,212,0.1)'
+          };">
+            ${s.time} [${s.busy ? 'BUSY' : 'FREE'}]
+          </span>
+        `
+        )
+        .join('');
+
+      return `
       <div class="pixel-card teacher-card">
         <div>
           <div class="teacher-header">
-            <div class="teacher-avatar">${t.avatar}</div>
+            <div class="teacher-avatar">${t.avatar || '👩‍🏫'}</div>
             <div>
               <span class="status-badge">● ${t.status}</span>
-              <h3 style="margin-top:0.35rem;font-size:1.1rem;color:#fff;">${t.name}</h3>
-              <div style="color:var(--cyan-primary);font-family:var(--font-terminal);font-size:1.1rem;">
+              <h3 style="margin-top:0.35rem;font-size:1.05rem;color:#fff;">${t.name}</h3>
+              <div style="color:var(--cyan-primary);font-family:var(--font-terminal);font-size:1.05rem;">
                 ${t.subject} • ${t.room}
               </div>
             </div>
           </div>
-          <p style="margin-top:0.85rem;color:var(--text-muted);font-size:0.92rem;line-height:1.5;">
+          <p style="margin-top:0.65rem;color:var(--text-muted);font-size:0.88rem;line-height:1.45;">
             ${t.specialty}
           </p>
-          <div style="margin-top:0.65rem;font-family:var(--font-terminal);font-size:1.05rem;color:var(--neon-gold);">
-            🕒 Next Open Slot: ${t.nextSlot}
+          <div style="margin-top:0.55rem;font-family:var(--font-terminal);font-size:1rem;color:var(--neon-gold);">
+            🕒 Next Free Slot: ${nextOpen} (${freeSlots.length} Free / ${slots.length - freeSlots.length} Busy)
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.45rem;">
+            ${slotBadgesHtml}
           </div>
         </div>
 
@@ -775,12 +867,12 @@ function renderTeachers() {
             🚨 1-CLICK SOS
           </button>
           <button class="pixel-btn" onclick="openAppointmentModal('${t.id}')">
-            📅 BOOK SLOT
+            📅 BOOK EXTRA CLASS
           </button>
         </div>
       </div>
-    `
-    )
+    `;
+    })
     .join('');
 }
 
@@ -814,48 +906,99 @@ window.openAppointmentModal = function (teacherId) {
   const teacher = TEACHERS.find((t) => t.id === teacherId);
   if (!teacher) return;
 
+  const slots = Array.isArray(teacher.slots) ? teacher.slots : [];
+  const freeSlots = slots.filter((s) => !s.busy);
+
+  const optionsHtml =
+    freeSlots.length > 0
+      ? freeSlots.map((s) => `<option value="${s.time}">🟢 ${s.time} (FREE SLOT)</option>`).join('')
+      : `<option value="">⚠️ All slots currently busy — free a slot in Admin Inventory below!</option>`;
+
   openModal(`
-    <h3 style="font-family:var(--font-pixel);font-size:0.85rem;color:var(--cyan-primary);margin-bottom:1rem;">
-      📅 SCHEDULE 1-ON-1 APPOINTMENT // ${teacher.name}
+    <h3 style="font-family:var(--font-pixel);font-size:0.75rem;color:var(--cyan-primary);margin-bottom:0.85rem;">
+      📅 BOOK EXTRA CLASS / 1-ON-1 SLOT // ${teacher.name}
     </h3>
-    <form onsubmit="confirmAppointment(event, '${teacher.id}')" style="display:flex;flex-direction:column;gap:0.9rem;">
+    <form onsubmit="confirmAppointment(event, '${teacher.id}')" style="display:flex;flex-direction:column;gap:0.75rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+        <div>
+          <label style="font-family:var(--font-terminal);font-size:1.05rem;color:var(--text-muted);">Student Full Name:</label>
+          <input id="appt-student-name" type="text" class="pixel-input" placeholder="e.g., Abuzar / Sumaiya Ali" required />
+        </div>
+        <div>
+          <label style="font-family:var(--font-terminal);font-size:1.05rem;color:var(--text-muted);">Roll No / Student ID:</label>
+          <input id="appt-student-roll" type="text" class="pixel-input" placeholder="e.g., CS-2026-105" required />
+        </div>
+      </div>
       <div>
-        <label style="font-family:var(--font-terminal);font-size:1.15rem;color:var(--text-muted);">Select Time Slot:</label>
+        <label style="font-family:var(--font-terminal);font-size:1.05rem;color:var(--text-muted);">Student Email / Contact:</label>
+        <input id="appt-student-email" type="email" class="pixel-input" placeholder="student@campus.edu" required />
+      </div>
+      <div>
+        <label style="font-family:var(--font-terminal);font-size:1.05rem;color:var(--text-muted);">Select Available Free Slot:</label>
         <select id="appt-time" class="pixel-select" required>
-          <option value="${teacher.nextSlot}">${teacher.nextSlot} (Recommended)</option>
-          <option value="Today, 04:15 PM">Today, 04:15 PM</option>
-          <option value="Tomorrow, 11:00 AM">Tomorrow, 11:00 AM</option>
+          ${optionsHtml}
         </select>
       </div>
       <div>
-        <label style="font-family:var(--font-terminal);font-size:1.15rem;color:var(--text-muted);">Problem / Topic to Discuss:</label>
-        <input id="appt-topic" type="text" class="pixel-input" placeholder="e.g., Need help with Exam Prep & Problem Set #3" required />
+        <label style="font-family:var(--font-terminal);font-size:1.05rem;color:var(--text-muted);">Extra Class Topic / Problem to Discuss:</label>
+        <input id="appt-topic" type="text" class="pixel-input" placeholder="e.g., Extra Class on Force Vectors & Exam Prep" required />
       </div>
-      <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:0.5rem;">
+      <div style="display:flex;gap:0.65rem;justify-content:flex-end;margin-top:0.4rem;">
         <button type="button" class="pixel-btn magenta-btn" onclick="closeModal()">CANCEL</button>
-        <button type="submit" class="pixel-btn gold-btn">CONFIRM BOOKING ✓</button>
+        <button type="submit" class="pixel-btn gold-btn" ${freeSlots.length === 0 ? 'disabled' : ''}>SAVE BOOKING TO DB ✓</button>
       </div>
     </form>
   `);
 };
 
-window.confirmAppointment = function (e, teacherId) {
+window.confirmAppointment = async function (e, teacherId) {
   e.preventDefault();
   const teacher = TEACHERS.find((t) => t.id === teacherId);
-  const time = document.getElementById('appt-time').value;
-  const topic = document.getElementById('appt-topic').value;
+  if (!teacher) return;
 
-  appState.appointments.push({
+  const studentName = document.getElementById('appt-student-name').value.trim();
+  const studentRoll = document.getElementById('appt-student-roll').value.trim();
+  const studentEmail = document.getElementById('appt-student-email').value.trim();
+  const time = document.getElementById('appt-time').value;
+  const topic = document.getElementById('appt-topic').value.trim();
+
+  if (!time) {
+    showToast('⚠️ No free slot selected!');
+    return;
+  }
+
+  const bookingRecord = {
+    id: 'bk-' + Date.now(),
+    studentName,
+    studentRoll,
+    studentEmail,
+    teacherId: teacher.id,
     teacherName: teacher.name,
     subject: teacher.subject,
     time,
+    slotTime: time,
     topic,
-  });
+    createdAt: new Date().toLocaleString(),
+  };
+
+  // Mark teacher's slot as busy in database
+  if (Array.isArray(teacher.slots)) {
+    const slotObj = teacher.slots.find((s) => s.time === time);
+    if (slotObj) {
+      slotObj.busy = true;
+      slotObj.bookedBy = `${studentName} (${studentRoll})`;
+    }
+  }
+
+  appState.appointments.unshift(bookingRecord);
+  await persistDatabaseToServer('book_extra_class', bookingRecord);
 
   window.soundEngine.playSuccess();
   closeModal();
+  renderTeachers();
   renderAppointmentsList();
-  addXP(40, `Booked Appointment with ${teacher.name}`);
+  renderDbAdminPanel();
+  addXP(40, `Stored Extra Class Booking for ${studentName}`);
 };
 
 function renderAppointmentsList() {
@@ -867,16 +1010,22 @@ function renderAppointmentsList() {
   }
   box.style.display = 'block';
   box.innerHTML = `
-    <div style="font-family:var(--font-pixel);font-size:0.7rem;color:var(--neon-gold);margin-bottom:0.6rem;">
-      📌 YOUR CONFIRMED TEACHER APPOINTMENTS (${appState.appointments.length})
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.55rem;flex-wrap:wrap;gap:0.5rem;">
+      <span style="font-family:var(--font-pixel);font-size:0.62rem;color:var(--neon-gold);">
+        📌 STORED EXTRA-CLASS STUDENT BOOKINGS IN DATABASE (${appState.appointments.length})
+      </span>
+      <a href="#inventory-db-section" onclick="switchDbAdminTab('records')" style="font-family:var(--font-terminal);font-size:1rem;color:var(--cyan-primary);">
+        [Manage in Database Admin ➔]
+      </a>
     </div>
-    <div style="display:grid;gap:0.5rem;">
+    <div style="display:grid;gap:0.45rem;">
       ${appState.appointments
+        .slice(0, 5)
         .map(
           (a) => `
-        <div style="background:var(--navy-card);padding:0.6rem 0.9rem;border-left:4px solid var(--cyan-primary);display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
-          <span><strong>${a.teacherName}</strong> (${a.subject}) — <em>"${a.topic}"</em></span>
-          <span style="color:var(--cyan-primary);font-family:var(--font-terminal);font-size:1.1rem;">🕒 ${a.time}</span>
+        <div style="background:var(--navy-card);padding:0.5rem 0.8rem;border-left:3px solid var(--cyan-primary);display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;font-size:0.88rem;">
+          <span>👩‍🎓 <strong>${a.studentName || 'Student'}</strong> (${a.studentRoll || 'ID'}) ➔ <strong>${a.teacherName}</strong> (${a.subject}) — <em>"${a.topic}"</em></span>
+          <span style="color:var(--cyan-primary);font-family:var(--font-terminal);font-size:1rem;">🕒 ${a.time || a.slotTime}</span>
         </div>
       `
         )
@@ -1142,15 +1291,72 @@ window.confirmSeatReservation = function () {
     showToast('⚠️ Click an OPEN cyan seat on the map first!');
     return;
   }
+  const zone = GAME_ZONES.find((z) => z.id === appState.selectedZoneId);
   const timeWindow = document.getElementById('booking-time-window').value;
-  appState.reservedSeats.push(appState.selectedSeatId);
+
+  openModal(`
+    <h3 style="font-family:var(--font-pixel);font-size:0.75rem;color:var(--neon-gold);margin-bottom:0.85rem;">
+      🎟️ RESERVE GAME SEAT // ${zone ? zone.name : ''} (${appState.selectedSeatId})
+    </h3>
+    <form onsubmit="submitGameSeatReservation(event)" style="display:flex;flex-direction:column;gap:0.75rem;">
+      <div>
+        <label style="font-family:var(--font-terminal);font-size:1.05rem;color:var(--text-muted);">Student Name:</label>
+        <input id="game-student-name" type="text" class="pixel-input" placeholder="e.g., Abuzar / Ramsha" required />
+      </div>
+      <div>
+        <label style="font-family:var(--font-terminal);font-size:1.05rem;color:var(--text-muted);">Roll No / Student ID:</label>
+        <input id="game-student-roll" type="text" class="pixel-input" placeholder="e.g., CS-2026-088" required />
+      </div>
+      <div style="font-family:var(--font-terminal);font-size:1.05rem;color:var(--cyan-primary);">
+        ⏰ Selected Window: ${timeWindow}
+      </div>
+      <div style="display:flex;gap:0.65rem;justify-content:flex-end;margin-top:0.4rem;">
+        <button type="button" class="pixel-btn magenta-btn" onclick="closeModal()">CANCEL</button>
+        <button type="submit" class="pixel-btn gold-btn">LOCK IN SEAT & SAVE TO DB ✓</button>
+      </div>
+    </form>
+  `);
+};
+
+window.submitGameSeatReservation = async function (e) {
+  if (e) e.preventDefault();
+  const studentName = document.getElementById('game-student-name').value.trim();
+  const studentRoll = document.getElementById('game-student-roll').value.trim();
+  const timeWindow = document.getElementById('booking-time-window').value;
+  const zone = GAME_ZONES.find((z) => z.id === appState.selectedZoneId);
   const bookedId = appState.selectedSeatId;
+
+  if (!bookedId || !zone) return;
+
+  const slotObj = zone.slots.find((s) => s.id === bookedId);
+  if (slotObj) {
+    slotObj.occupied = true;
+    slotObj.bookedBy = `${studentName} (${studentRoll})`;
+  }
+
+  appState.reservedSeats.push(bookedId);
   appState.selectedSeatId = null;
 
+  const reservationRecord = {
+    id: 'gr-' + Date.now(),
+    studentName,
+    studentRoll,
+    zoneId: zone.id,
+    zoneName: zone.name,
+    seatId: bookedId,
+    timeWindow,
+    reservedAt: new Date().toLocaleString(),
+  };
+
+  appState.gameReservations.unshift(reservationRecord);
+  await persistDatabaseToServer('reserve_game_seat', reservationRecord);
+
   window.soundEngine.playSuccess();
+  closeModal();
   renderGameZones();
   renderSelectedZoneSeats();
-  addXP(30, `Reserved Game Seat ${bookedId} (${timeWindow})`);
+  renderDbAdminPanel();
+  addXP(30, `Reserved Game Seat ${bookedId} for ${studentName}`);
 };
 
 function startClassCountdownTimer() {
@@ -1165,7 +1371,7 @@ function startClassCountdownTimer() {
 }
 
 /* ==========================================================================
-   SECTION 6: CAMPUS QUESTS & 1-CLICK PARTICIPATION
+   SECTION 6: CAMPUS QUESTS & PARTICIPANT DATABASE REGISTRATION
    ========================================================================== */
 function renderCampusEvents() {
   const grid = document.getElementById('campus-events-grid');
@@ -1186,7 +1392,7 @@ function renderCampusEvents() {
         </div>
         <button class="pixel-btn ${ev.joined ? 'lime-btn' : 'gold-btn'}"
                 onclick="toggleEventJoin('${ev.id}')">
-          ${ev.joined ? '✓ REGISTERED IN QUEST' : '🚀 1-CLICK PARTICIPATE'}
+          ${ev.joined ? '✓ REGISTERED (+ADD ANOTHER)' : '🚀 REGISTER PARTICIPANT'}
         </button>
       </div>
     `
@@ -1196,15 +1402,65 @@ function renderCampusEvents() {
 window.toggleEventJoin = function (evId) {
   const ev = CAMPUS_EVENTS.find((e) => e.id === evId);
   if (!ev) return;
-  if (!ev.joined) {
-    ev.joined = true;
-    ev.participants++;
-    window.soundEngine.playSuccess();
-    addXP(60, `Joined ${ev.title.slice(0, 26)}`);
-  } else {
-    showToast(`You're already registered for ${ev.title}!`);
-  }
+
+  openModal(`
+    <h3 style="font-family:var(--font-pixel);font-size:0.75rem;color:var(--cyan-primary);margin-bottom:0.85rem;">
+      🚀 COMPETITION & EVENT REGISTRATION // ${ev.title}
+    </h3>
+    <form onsubmit="confirmEventParticipation(event, '${ev.id}')" style="display:flex;flex-direction:column;gap:0.75rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+        <div>
+          <label style="font-family:var(--font-terminal);font-size:1.05rem;color:var(--text-muted);">Participant Full Name:</label>
+          <input id="part-student-name" type="text" class="pixel-input" placeholder="e.g., Bhoomika / Sumaiya Ali" required />
+        </div>
+        <div>
+          <label style="font-family:var(--font-terminal);font-size:1.05rem;color:var(--text-muted);">Roll No / Student ID:</label>
+          <input id="part-student-roll" type="text" class="pixel-input" placeholder="e.g., AI-2026-019" required />
+        </div>
+      </div>
+      <div>
+        <label style="font-family:var(--font-terminal);font-size:1.05rem;color:var(--text-muted);">Participant Email / Team Name:</label>
+        <input id="part-student-email" type="text" class="pixel-input" placeholder="team@dreambyte.edu" required />
+      </div>
+      <div style="display:flex;gap:0.65rem;justify-content:flex-end;margin-top:0.4rem;">
+        <button type="button" class="pixel-btn magenta-btn" onclick="closeModal()">CANCEL</button>
+        <button type="submit" class="pixel-btn gold-btn">REGISTER & SAVE TO DB ✓</button>
+      </div>
+    </form>
+  `);
+};
+
+window.confirmEventParticipation = async function (e, evId) {
+  e.preventDefault();
+  const ev = CAMPUS_EVENTS.find((item) => item.id === evId);
+  if (!ev) return;
+
+  const studentName = document.getElementById('part-student-name').value.trim();
+  const studentRoll = document.getElementById('part-student-roll').value.trim();
+  const studentEmail = document.getElementById('part-student-email').value.trim();
+
+  ev.joined = true;
+  ev.participants = (Number(ev.participants) || 0) + 1;
+
+  const participantRecord = {
+    id: 'cp-' + Date.now(),
+    studentName,
+    studentRoll,
+    studentEmail,
+    competitionId: ev.id,
+    competitionTitle: ev.title,
+    category: ev.category,
+    registeredAt: new Date().toLocaleString(),
+  };
+
+  appState.competitionParticipants.unshift(participantRecord);
+  await persistDatabaseToServer('register_participant', participantRecord);
+
+  window.soundEngine.playSuccess();
+  closeModal();
   renderCampusEvents();
+  renderDbAdminPanel();
+  addXP(60, `Registered ${studentName} in ${ev.title.slice(0, 22)}`);
 };
 
 /* ==========================================================================
@@ -1480,4 +1736,598 @@ window.stopJudgePresentation = function () {
   const tourBar = document.getElementById('tour-banner-bar');
   if (overlay) overlay.classList.remove('active');
   if (tourBar) tourBar.classList.remove('active');
+};
+
+/* ==========================================================================
+   SECTION 7: COMMERCIAL INVENTORY & DATABASE ENGINE (`/api/db` + LocalStorage)
+   ========================================================================== */
+function getFullDatabaseSnapshot() {
+  return {
+    teachers: TEACHERS,
+    gameZones: GAME_ZONES,
+    competitions: CAMPUS_EVENTS,
+    studentBookings: appState.appointments,
+    competitionParticipants: appState.competitionParticipants,
+    gameReservations: appState.gameReservations,
+  };
+}
+
+function applyDatabaseSnapshot(db) {
+  if (!db) return;
+  if (Array.isArray(db.teachers) && db.teachers.length > 0) TEACHERS = db.teachers;
+  if (Array.isArray(db.gameZones) && db.gameZones.length > 0) GAME_ZONES = db.gameZones;
+  if (Array.isArray(db.competitions) && db.competitions.length > 0) CAMPUS_EVENTS = db.competitions;
+  if (Array.isArray(db.studentBookings)) appState.appointments = db.studentBookings;
+  if (Array.isArray(db.competitionParticipants))
+    appState.competitionParticipants = db.competitionParticipants;
+  if (Array.isArray(db.gameReservations)) appState.gameReservations = db.gameReservations;
+}
+
+async function initDatabaseSync() {
+  // 1. Load from LocalStorage first for instant zero-latency persistence
+  try {
+    const localRaw = localStorage.getItem(DB_STORAGE_KEY);
+    if (localRaw) {
+      applyDatabaseSnapshot(JSON.parse(localRaw));
+      return;
+    }
+  } catch (err) {}
+
+  // 2. Otherwise fetch initial database seed from `/api/db`
+  try {
+    const res = await fetch('/api/db');
+    if (res.ok) {
+      const serverDb = await res.json();
+      applyDatabaseSnapshot(serverDb);
+      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(getFullDatabaseSnapshot()));
+    }
+  } catch (err) {}
+}
+
+async function persistDatabaseToServer(action = 'sync_full_db', payload = null) {
+  const fullSnapshot = getFullDatabaseSnapshot();
+  try {
+    localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(fullSnapshot));
+  } catch (err) {}
+
+  try {
+    await fetch('/api/db', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'sync_full_db',
+        payload: fullSnapshot,
+      }),
+    });
+  } catch (err) {}
+}
+
+window.switchDbAdminTab = function (tabName) {
+  appState.dbAdminTab = tabName;
+  renderDbAdminPanel();
+};
+
+window.renderDbAdminPanel = function () {
+  const container = document.getElementById('db-admin-workspace');
+  if (!container) return;
+
+  const tab = appState.dbAdminTab || 'teachers';
+
+  if (tab === 'teachers') {
+    container.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;margin-bottom:1rem;border-bottom:1.5px solid var(--navy-border);padding-bottom:0.65rem;">
+        <div>
+          <h3 style="font-family:var(--font-pixel);font-size:0.74rem;color:var(--cyan-primary);">
+            👩‍🏫 TEACHER INVENTORY & FREE / BUSY SLOT MANAGER (${TEACHERS.length} TEACHERS)
+          </h3>
+          <p style="font-size:0.86rem;color:var(--text-muted);margin-top:0.25rem;">
+            Click any slot badge to toggle it between <strong style="color:var(--cyan-primary);">FREE (Open for Extra Class)</strong> and <strong style="color:var(--neon-magenta);">BUSY</strong>, add new slots, or add/edit teachers!
+          </p>
+        </div>
+        <button class="pixel-btn gold-btn" onclick="openAddTeacherModal()">+ ADD NEW TEACHER</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:0.85rem;">
+        ${TEACHERS.map(
+          (t) => `
+          <div style="background:var(--navy-deepest);border:1.5px solid var(--navy-border);padding:0.85rem;display:flex;flex-direction:column;justify-content:space-between;gap:0.65rem;">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;">
+                <div>
+                  <strong style="color:#fff;font-size:0.98rem;">${t.avatar || '👩‍🏫'} ${t.name}</strong>
+                  <div style="font-family:var(--font-terminal);font-size:1rem;color:var(--cyan-primary);">
+                    ${t.subject} • ${t.room}
+                  </div>
+                </div>
+                <div style="display:flex;gap:0.35rem;">
+                  <button class="pixel-btn" style="padding:0.25rem 0.45rem;font-size:0.46rem;" onclick="openEditTeacherModal('${t.id}')">✏️ EDIT</button>
+                  <button class="pixel-btn magenta-btn" style="padding:0.25rem 0.45rem;font-size:0.46rem;" onclick="deleteTeacherFromDb('${t.id}')">🗑️</button>
+                </div>
+              </div>
+
+              <div style="margin-top:0.65rem;font-family:var(--font-terminal);font-size:0.95rem;color:var(--neon-gold);">
+                🕒 Click a Slot to Toggle FREE / BUSY:
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.35rem;">
+                ${(t.slots || [])
+                  .map(
+                    (s, sIdx) => `
+                    <button type="button"
+                            onclick="toggleTeacherSlotStatus('${t.id}', ${sIdx})"
+                            style="cursor:pointer;font-family:var(--font-terminal);font-size:0.92rem;padding:0.2rem 0.5rem;border:1.5px solid ${
+                              s.busy ? 'var(--neon-magenta)' : 'var(--neon-lime)'
+                            };background:${
+                              s.busy ? 'rgba(255,42,133,0.18)' : 'rgba(6,214,160,0.16)'
+                            };color:${s.busy ? '#ff7aa8' : 'var(--neon-lime)'};">
+                      ${s.time} • <strong>${s.busy ? 'BUSY 🔴' : 'FREE 🟢'}</strong>
+                      ${s.bookedBy ? `(${s.bookedBy})` : ''}
+                    </button>
+                  `
+                  )
+                  .join('')}
+              </div>
+            </div>
+
+            <div style="display:flex;gap:0.4rem;margin-top:0.4rem;border-top:1px dashed var(--navy-border);padding-top:0.5rem;">
+              <input id="new-slot-input-${t.id}" type="text" class="pixel-input" style="padding:0.3rem 0.5rem;font-size:0.8rem;" placeholder="e.g., Tomorrow, 03:00 PM" />
+              <button class="pixel-btn lime-btn" style="padding:0.3rem 0.55rem;font-size:0.48rem;" onclick="addSlotToTeacher('${t.id}')">+ ADD SLOT</button>
+            </div>
+          </div>
+        `
+        ).join('')}
+      </div>
+    `;
+  } else if (tab === 'games') {
+    container.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;margin-bottom:1rem;border-bottom:1.5px solid var(--navy-border);padding-bottom:0.65rem;">
+        <div>
+          <h3 style="font-family:var(--font-pixel);font-size:0.74rem;color:var(--cyan-primary);">
+            🏓 GAME ZONES & SEAT INVENTORY MANAGER (${GAME_ZONES.length} ZONES)
+          </h3>
+          <p style="font-size:0.86rem;color:var(--text-muted);margin-top:0.25rem;">
+            Click any seat slot below to toggle it between <strong style="color:var(--neon-lime);">OPEN (Free)</strong> and <strong style="color:var(--neon-magenta);">OCCUPIED (Busy)</strong>, or add a new Gaming Zone!
+          </p>
+        </div>
+        <button class="pixel-btn gold-btn" onclick="openAddGameZoneModal()">+ ADD NEW GAME ZONE</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:0.85rem;">
+        ${GAME_ZONES.map(
+          (z) => `
+          <div style="background:var(--navy-deepest);border:1.5px solid var(--navy-border);padding:0.85rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+              <div>
+                <span class="resource-tag">${z.type}</span>
+                <strong style="color:#fff;font-size:0.96rem;margin-left:0.4rem;">${z.name}</strong>
+              </div>
+              <button class="pixel-btn magenta-btn" style="padding:0.22rem 0.45rem;font-size:0.46rem;" onclick="deleteGameZoneFromDb('${z.id}')">🗑️</button>
+            </div>
+            <div style="font-family:var(--font-terminal);font-size:0.95rem;color:var(--neon-gold);margin-bottom:0.4rem;">
+              Click any Seat to Toggle OPEN / BUSY:
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.35rem;">
+              ${(z.slots || [])
+                .map(
+                  (s, sIdx) => `
+                  <button type="button"
+                          onclick="toggleGameSeatStatusInDb('${z.id}', ${sIdx})"
+                          style="cursor:pointer;font-family:var(--font-terminal);font-size:0.9rem;padding:0.3rem;border:1.5px solid ${
+                            s.occupied ? 'var(--neon-magenta)' : 'var(--cyan-primary)'
+                          };background:${
+                            s.occupied ? 'rgba(255,42,133,0.16)' : 'rgba(0,245,212,0.12)'
+                          };color:${s.occupied ? '#ff7aa8' : 'var(--cyan-primary)'};text-align:left;">
+                    <strong>${s.id}</strong> (${s.label})<br/>
+                    <span>${s.occupied ? '🔴 BUSY' : '🟢 OPEN'} ${s.bookedBy ? `• ${s.bookedBy}` : ''}</span>
+                  </button>
+                `
+                )
+                .join('')}
+            </div>
+          </div>
+        `
+        ).join('')}
+      </div>
+    `;
+  } else if (tab === 'competitions') {
+    container.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;margin-bottom:1rem;border-bottom:1.5px solid var(--navy-border);padding-bottom:0.65rem;">
+        <div>
+          <h3 style="font-family:var(--font-pixel);font-size:0.74rem;color:var(--cyan-primary);">
+            🏆 COMPETITIONS & CAMPUS EVENTS INVENTORY (${CAMPUS_EVENTS.length} ACTIVE)
+          </h3>
+          <p style="font-size:0.86rem;color:var(--text-muted);margin-top:0.25rem;">
+            Add, edit, or remove campus competitions, hackathons, and tournaments in the database!
+          </p>
+        </div>
+        <button class="pixel-btn gold-btn" onclick="openAddCompetitionModal()">+ ADD NEW COMPETITION</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:0.85rem;">
+        ${CAMPUS_EVENTS.map(
+          (ev) => `
+          <div style="background:var(--navy-deepest);border:1.5px solid var(--navy-border);padding:0.85rem;display:flex;flex-direction:column;justify-content:space-between;gap:0.65rem;">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="resource-tag">${ev.category}</span>
+                <button class="pixel-btn magenta-btn" style="padding:0.22rem 0.45rem;font-size:0.46rem;" onclick="deleteCompetitionFromDb('${ev.id}')">🗑️ REMOVE</button>
+              </div>
+              <h4 style="color:#fff;font-size:0.96rem;margin-top:0.5rem;">${ev.title}</h4>
+              <div style="font-family:var(--font-terminal);font-size:0.98rem;color:var(--cyan-primary);margin-top:0.3rem;">
+                🕒 ${ev.time} • 👥 ${ev.participants} Registered
+              </div>
+              <div style="font-family:var(--font-terminal);font-size:0.95rem;color:var(--neon-gold);">
+                🏆 Reward: ${ev.reward}
+              </div>
+            </div>
+          </div>
+        `
+        ).join('')}
+      </div>
+    `;
+  } else {
+    // STORED STUDENT RECORDS TAB (Extra Class Bookings, Competition Participants, Game Seat Reservations)
+    container.innerHTML = `
+      <div style="margin-bottom:1rem;border-bottom:1.5px solid var(--navy-border);padding-bottom:0.65rem;">
+        <h3 style="font-family:var(--font-pixel);font-size:0.74rem;color:var(--neon-gold);">
+          📋 STORED STUDENT DATABASE RECORDS (EXTRA CLASSES, PARTICIPANTS & GAME SEATS)
+        </h3>
+        <p style="font-size:0.86rem;color:var(--text-muted);margin-top:0.25rem;">
+          All student extra-class bookings, competition registrations, and pre-booked gaming seats are persisted in the database!
+        </p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(310px, 1fr));gap:1rem;">
+        <!-- Column 1: Extra Class Bookings -->
+        <div style="background:var(--navy-deepest);border:1.5px solid var(--cyan-primary);padding:0.85rem;">
+          <div style="font-family:var(--font-pixel);font-size:0.6rem;color:var(--cyan-primary);margin-bottom:0.65rem;">
+            📅 EXTRA-CLASS & TEACHER BOOKINGS (${appState.appointments.length})
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.5rem;max-height:280px;overflow-y:auto;">
+            ${
+              appState.appointments.length === 0
+                ? '<div style="color:var(--text-muted);font-size:0.85rem;">No student bookings yet.</div>'
+                : appState.appointments
+                    .map(
+                      (b) => `
+                  <div style="background:var(--navy-card);padding:0.55rem;border-left:3px solid var(--cyan-primary);font-size:0.84rem;">
+                    <div style="color:#fff;font-weight:700;">👩‍🎓 ${b.studentName || 'Student'} (${b.studentRoll || 'N/A'})</div>
+                    <div style="color:var(--text-muted);">${b.studentEmail || ''}</div>
+                    <div style="color:var(--cyan-primary);margin-top:0.2rem;">➔ ${b.teacherName} (${b.subject}) @ ${b.time || b.slotTime}</div>
+                    <div style="color:var(--neon-gold);font-style:italic;margin-top:0.15rem;">"${b.topic}"</div>
+                  </div>
+                `
+                    )
+                    .join('')
+            }
+          </div>
+        </div>
+
+        <!-- Column 2: Competition Participants -->
+        <div style="background:var(--navy-deepest);border:1.5px solid var(--neon-gold);padding:0.85rem;">
+          <div style="font-family:var(--font-pixel);font-size:0.6rem;color:var(--neon-gold);margin-bottom:0.65rem;">
+            🏆 COMPETITION PARTICIPANTS (${appState.competitionParticipants.length})
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.5rem;max-height:280px;overflow-y:auto;">
+            ${
+              appState.competitionParticipants.length === 0
+                ? '<div style="color:var(--text-muted);font-size:0.85rem;">No competition participants yet.</div>'
+                : appState.competitionParticipants
+                    .map(
+                      (p) => `
+                  <div style="background:var(--navy-card);padding:0.55rem;border-left:3px solid var(--neon-gold);font-size:0.84rem;">
+                    <div style="color:#fff;font-weight:700;">🚀 ${p.studentName} (${p.studentRoll})</div>
+                    <div style="color:var(--text-muted);">${p.studentEmail || ''}</div>
+                    <div style="color:var(--neon-gold);margin-top:0.2rem;">Event: ${p.competitionTitle}</div>
+                    <div style="color:var(--cyan-primary);font-size:0.78rem;">Registered: ${p.registeredAt || 'Just now'}</div>
+                  </div>
+                `
+                    )
+                    .join('')
+            }
+          </div>
+        </div>
+
+        <!-- Column 3: Game Seat Reservations -->
+        <div style="background:var(--navy-deepest);border:1.5px solid var(--neon-lime);padding:0.85rem;">
+          <div style="font-family:var(--font-pixel);font-size:0.6rem;color:var(--neon-lime);margin-bottom:0.65rem;">
+            🏓 GAME SEAT RESERVATIONS (${appState.gameReservations.length})
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.5rem;max-height:280px;overflow-y:auto;">
+            ${
+              appState.gameReservations.length === 0
+                ? '<div style="color:var(--text-muted);font-size:0.85rem;">No game seat reservations yet.</div>'
+                : appState.gameReservations
+                    .map(
+                      (g) => `
+                  <div style="background:var(--navy-card);padding:0.55rem;border-left:3px solid var(--neon-lime);font-size:0.84rem;">
+                    <div style="color:#fff;font-weight:700;">🎮 ${g.studentName} (${g.studentRoll})</div>
+                    <div style="color:var(--neon-lime);margin-top:0.2rem;">Seat: ${g.seatId} • ${g.zoneName}</div>
+                    <div style="color:var(--cyan-primary);">${g.timeWindow}</div>
+                  </div>
+                `
+                    )
+                    .join('')
+            }
+          </div>
+        </div>
+      </div>
+    `;
+  }
+};
+
+/* ==========================================================================
+   ADMIN INVENTORY CRUD ACTIONS (TEACHERS, SLOTS, GAMES, COMPETITIONS)
+   ========================================================================== */
+window.toggleTeacherSlotStatus = async function (teacherId, slotIdx) {
+  const teacher = TEACHERS.find((t) => t.id === teacherId);
+  if (!teacher || !teacher.slots || !teacher.slots[slotIdx]) return;
+  const slot = teacher.slots[slotIdx];
+  slot.busy = !slot.busy;
+  if (!slot.busy) slot.bookedBy = null;
+  else if (!slot.bookedBy) slot.bookedBy = 'Marked Busy by Admin';
+
+  await persistDatabaseToServer();
+  renderTeachers();
+  renderDbAdminPanel();
+  showToast(`🕒 Slot "${slot.time}" marked as ${slot.busy ? 'BUSY 🔴' : 'FREE 🟢'}`);
+};
+
+window.addSlotToTeacher = async function (teacherId) {
+  const teacher = TEACHERS.find((t) => t.id === teacherId);
+  const input = document.getElementById(`new-slot-input-${teacherId}`);
+  if (!teacher || !input || !input.value.trim()) return;
+  const newTime = input.value.trim();
+  if (!Array.isArray(teacher.slots)) teacher.slots = [];
+  teacher.slots.push({
+    id: `${teacherId}-s${Date.now()}`,
+    time: newTime,
+    busy: false,
+    bookedBy: null,
+  });
+  input.value = '';
+  await persistDatabaseToServer();
+  renderTeachers();
+  renderDbAdminPanel();
+  showToast(`✅ Added Free Slot "${newTime}" for ${teacher.name}`);
+};
+
+window.openAddTeacherModal = function () {
+  openModal(`
+    <h3 style="font-family:var(--font-pixel);font-size:0.75rem;color:var(--cyan-primary);margin-bottom:0.85rem;">
+      👩‍🏫 ADD NEW TEACHER TO INVENTORY DATABASE
+    </h3>
+    <form onsubmit="saveNewTeacherToDb(event)" style="display:flex;flex-direction:column;gap:0.7rem;">
+      <input id="new-t-name" class="pixel-input" placeholder="Teacher Name (e.g., Dr. Sarah Khan)" required />
+      <select id="new-t-subject" class="pixel-select">
+        <option value="Physics">Physics</option>
+        <option value="Mathematics">Mathematics</option>
+        <option value="Computer Science">Computer Science</option>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Biology">Biology</option>
+        <option value="History">History</option>
+      </select>
+      <input id="new-t-room" class="pixel-input" placeholder="Room / Lab (e.g., Quantum Pod 301)" required />
+      <input id="new-t-spec" class="pixel-input" placeholder="Specialty topics..." required />
+      <input id="new-t-slot" class="pixel-input" placeholder="Initial Free Slot (e.g., Today, 03:30 PM)" value="Today, 03:30 PM" required />
+      <div style="display:flex;gap:0.6rem;justify-content:flex-end;">
+        <button type="button" class="pixel-btn magenta-btn" onclick="closeModal()">CANCEL</button>
+        <button type="submit" class="pixel-btn gold-btn">SAVE TEACHER ✓</button>
+      </div>
+    </form>
+  `);
+};
+
+window.saveNewTeacherToDb = async function (e) {
+  e.preventDefault();
+  const name = document.getElementById('new-t-name').value.trim();
+  const subject = document.getElementById('new-t-subject').value;
+  const room = document.getElementById('new-t-room').value.trim();
+  const specialty = document.getElementById('new-t-spec').value.trim();
+  const firstSlot = document.getElementById('new-t-slot').value.trim();
+
+  const newTeacher = {
+    id: 't-' + Date.now(),
+    name,
+    subject,
+    specialty,
+    avatar: '👩‍🏫',
+    status: 'Online • Instant SOS Ready',
+    room,
+    nextSlot: firstSlot,
+    slots: [{ id: 's-' + Date.now(), time: firstSlot, busy: false, bookedBy: null }],
+  };
+
+  TEACHERS.push(newTeacher);
+  await persistDatabaseToServer();
+  closeModal();
+  renderTeachers();
+  renderDbAdminPanel();
+  showToast(`✅ Added ${name} to Teacher Inventory!`);
+};
+
+window.openEditTeacherModal = function (teacherId) {
+  const t = TEACHERS.find((item) => item.id === teacherId);
+  if (!t) return;
+  openModal(`
+    <h3 style="font-family:var(--font-pixel);font-size:0.75rem;color:var(--cyan-primary);margin-bottom:0.85rem;">
+      ✏️ EDIT TEACHER // ${t.name}
+    </h3>
+    <form onsubmit="saveEditedTeacherToDb(event, '${t.id}')" style="display:flex;flex-direction:column;gap:0.7rem;">
+      <input id="edit-t-name" class="pixel-input" value="${t.name}" required />
+      <input id="edit-t-room" class="pixel-input" value="${t.room}" required />
+      <input id="edit-t-status" class="pixel-input" value="${t.status}" required />
+      <input id="edit-t-spec" class="pixel-input" value="${t.specialty}" required />
+      <div style="display:flex;gap:0.6rem;justify-content:flex-end;">
+        <button type="button" class="pixel-btn magenta-btn" onclick="closeModal()">CANCEL</button>
+        <button type="submit" class="pixel-btn gold-btn">UPDATE TEACHER ✓</button>
+      </div>
+    </form>
+  `);
+};
+
+window.saveEditedTeacherToDb = async function (e, teacherId) {
+  e.preventDefault();
+  const t = TEACHERS.find((item) => item.id === teacherId);
+  if (!t) return;
+  t.name = document.getElementById('edit-t-name').value.trim();
+  t.room = document.getElementById('edit-t-room').value.trim();
+  t.status = document.getElementById('edit-t-status').value.trim();
+  t.specialty = document.getElementById('edit-t-spec').value.trim();
+
+  await persistDatabaseToServer();
+  closeModal();
+  renderTeachers();
+  renderDbAdminPanel();
+  showToast(`✅ Updated ${t.name} in Database!`);
+};
+
+window.deleteTeacherFromDb = async function (teacherId) {
+  TEACHERS = TEACHERS.filter((t) => t.id !== teacherId);
+  await persistDatabaseToServer();
+  renderTeachers();
+  renderDbAdminPanel();
+  showToast('🗑️ Teacher removed from Inventory');
+};
+
+window.toggleGameSeatStatusInDb = async function (zoneId, slotIdx) {
+  const zone = GAME_ZONES.find((z) => z.id === zoneId);
+  if (!zone || !zone.slots || !zone.slots[slotIdx]) return;
+  const slot = zone.slots[slotIdx];
+  slot.occupied = !slot.occupied;
+  if (!slot.occupied) {
+    slot.bookedBy = null;
+    appState.reservedSeats = appState.reservedSeats.filter((id) => id !== slot.id);
+  } else if (!slot.bookedBy) {
+    slot.bookedBy = 'Admin Reserved';
+  }
+  await persistDatabaseToServer();
+  renderGameZones();
+  renderSelectedZoneSeats();
+  renderDbAdminPanel();
+  showToast(`🏓 Seat ${slot.id} set to ${slot.occupied ? 'BUSY 🔴' : 'OPEN 🟢'}`);
+};
+
+window.openAddGameZoneModal = function () {
+  openModal(`
+    <h3 style="font-family:var(--font-pixel);font-size:0.75rem;color:var(--cyan-primary);margin-bottom:0.85rem;">
+      🏟️ ADD NEW INDOOR / OUTDOOR GAME ZONE
+    </h3>
+    <form onsubmit="saveNewGameZoneToDb(event)" style="display:flex;flex-direction:column;gap:0.7rem;">
+      <input id="new-gz-name" class="pixel-input" placeholder="Zone Name (e.g., 🎱 Neon Snooker & Foosball Pod)" required />
+      <select id="new-gz-type" class="pixel-select">
+        <option value="INDOOR">INDOOR</option>
+        <option value="OUTDOOR">OUTDOOR</option>
+      </select>
+      <input id="new-gz-prefix" class="pixel-input" placeholder="Seat Code Prefix (e.g., SN)" value="SN" required />
+      <div style="display:flex;gap:0.6rem;justify-content:flex-end;">
+        <button type="button" class="pixel-btn magenta-btn" onclick="closeModal()">CANCEL</button>
+        <button type="submit" class="pixel-btn gold-btn">ADD GAME ZONE ✓</button>
+      </div>
+    </form>
+  `);
+};
+
+window.saveNewGameZoneToDb = async function (e) {
+  e.preventDefault();
+  const name = document.getElementById('new-gz-name').value.trim();
+  const type = document.getElementById('new-gz-type').value;
+  const prefix = document.getElementById('new-gz-prefix').value.trim().toUpperCase() || 'GM';
+
+  const newZone = {
+    id: 'zone-' + Date.now(),
+    type,
+    name,
+    nextFreeIn: 'Available Now!',
+    slots: [
+      { id: `${prefix}-01`, label: 'Station #1', occupied: false, bookedBy: null },
+      { id: `${prefix}-02`, label: 'Station #2', occupied: false, bookedBy: null },
+      { id: `${prefix}-03`, label: 'Station #3', occupied: false, bookedBy: null },
+      { id: `${prefix}-04`, label: 'Station #4', occupied: false, bookedBy: null },
+    ],
+  };
+
+  GAME_ZONES.push(newZone);
+  appState.selectedZoneId = newZone.id;
+  await persistDatabaseToServer();
+  closeModal();
+  renderGameZones();
+  renderSelectedZoneSeats();
+  renderDbAdminPanel();
+  showToast(`✅ Added ${name} to Game Inventory!`);
+};
+
+window.deleteGameZoneFromDb = async function (zoneId) {
+  GAME_ZONES = GAME_ZONES.filter((z) => z.id !== zoneId);
+  if (GAME_ZONES.length > 0) appState.selectedZoneId = GAME_ZONES[0].id;
+  await persistDatabaseToServer();
+  renderGameZones();
+  renderSelectedZoneSeats();
+  renderDbAdminPanel();
+  showToast('🗑️ Game Zone removed from Inventory');
+};
+
+window.openAddCompetitionModal = function () {
+  openModal(`
+    <h3 style="font-family:var(--font-pixel);font-size:0.75rem;color:var(--cyan-primary);margin-bottom:0.85rem;">
+      🏆 ADD NEW CAMPUS COMPETITION / EVENT
+    </h3>
+    <form onsubmit="saveNewCompetitionToDb(event)" style="display:flex;flex-direction:column;gap:0.7rem;">
+      <input id="new-ev-title" class="pixel-input" placeholder="Competition Title (e.g., ⚡ National Speed Coding Cup)" required />
+      <input id="new-ev-cat" class="pixel-input" placeholder="Category (e.g., Hackathon / Tournament / E-Sports)" value="Tournament" required />
+      <input id="new-ev-time" class="pixel-input" placeholder="Time (e.g., Sunday • 02:00 PM)" value="Sunday • 02:00 PM" required />
+      <input id="new-ev-reward" class="pixel-input" placeholder="Reward (e.g., +300 XP & Cash Prize)" value="+300 XP & Trophy" required />
+      <div style="display:flex;gap:0.6rem;justify-content:flex-end;">
+        <button type="button" class="pixel-btn magenta-btn" onclick="closeModal()">CANCEL</button>
+        <button type="submit" class="pixel-btn gold-btn">SAVE COMPETITION ✓</button>
+      </div>
+    </form>
+  `);
+};
+
+window.saveNewCompetitionToDb = async function (e) {
+  e.preventDefault();
+  const title = document.getElementById('new-ev-title').value.trim();
+  const category = document.getElementById('new-ev-cat').value.trim();
+  const time = document.getElementById('new-ev-time').value.trim();
+  const reward = document.getElementById('new-ev-reward').value.trim();
+
+  CAMPUS_EVENTS.unshift({
+    id: 'ev-' + Date.now(),
+    category,
+    title,
+    time,
+    reward,
+    participants: 1,
+    joined: false,
+  });
+
+  await persistDatabaseToServer();
+  closeModal();
+  renderCampusEvents();
+  renderDbAdminPanel();
+  showToast(`✅ Added "${title}" to Competitions DB!`);
+};
+
+window.deleteCompetitionFromDb = async function (evId) {
+  CAMPUS_EVENTS = CAMPUS_EVENTS.filter((e) => e.id !== evId);
+  await persistDatabaseToServer();
+  renderCampusEvents();
+  renderDbAdminPanel();
+  showToast('🗑️ Competition removed from Database');
+};
+
+window.exportDatabaseJSON = function () {
+  const dataStr = JSON.stringify(getFullDatabaseSnapshot(), null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'neon_pixel_academy_database.json';
+  a.click();
+  showToast('⬇ Exported complete Campus Database JSON!');
+};
+
+window.resetDatabaseToDefault = async function () {
+  localStorage.removeItem(DB_STORAGE_KEY);
+  location.reload();
 };

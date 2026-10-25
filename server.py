@@ -294,7 +294,90 @@ class NeonAcademyHandler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
 
+    def _read_db(self):
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "database.json")
+        if os.path.exists(db_path):
+            try:
+                with open(db_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return {
+            "teachers": [],
+            "gameZones": [],
+            "competitions": [],
+            "studentBookings": [],
+            "competitionParticipants": [],
+            "gameReservations": [],
+        }
+
+    def _write_db(self, data):
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "database.json")
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        with open(db_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+
+    def do_GET(self):
+        if self.path.split("?")[0] == "/api/db":
+            self._send_json(200, self._read_db())
+            return
+        super().do_GET()
+
     def do_POST(self):
+        if self.path.split("?")[0] == "/api/db":
+            content_length = int(self.headers.get("Content-Length", 0))
+            raw_body = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else "{}"
+            try:
+                body = json.loads(raw_body)
+            except json.JSONDecodeError:
+                self._send_json(400, {"error": "Invalid JSON body."})
+                return
+
+            action = body.get("action")
+            payload = body.get("payload")
+            db = self._read_db()
+
+            if action == "sync_full_db" and payload:
+                self._write_db(payload)
+                self._send_json(200, {"ok": True, "db": payload})
+                return
+
+            if action == "book_extra_class" and payload:
+                db.setdefault("studentBookings", []).insert(0, payload)
+                for t in db.get("teachers", []):
+                    if t.get("id") == payload.get("teacherId"):
+                        for s in t.get("slots", []):
+                            if s.get("time") == payload.get("slotTime"):
+                                s["busy"] = True
+                                s["bookedBy"] = f"{payload.get('studentName')} (Extra Class)"
+                self._write_db(db)
+                self._send_json(200, {"ok": True, "db": db})
+                return
+
+            if action == "register_participant" and payload:
+                db.setdefault("competitionParticipants", []).insert(0, payload)
+                for c in db.get("competitions", []):
+                    if c.get("id") == payload.get("competitionId"):
+                        c["participants"] = int(c.get("participants", 0)) + 1
+                self._write_db(db)
+                self._send_json(200, {"ok": True, "db": db})
+                return
+
+            if action == "reserve_game_seat" and payload:
+                db.setdefault("gameReservations", []).insert(0, payload)
+                for z in db.get("gameZones", []):
+                    if z.get("id") == payload.get("zoneId"):
+                        for s in z.get("slots", []):
+                            if s.get("id") == payload.get("seatId"):
+                                s["occupied"] = True
+                                s["bookedBy"] = payload.get("studentName")
+                self._write_db(db)
+                self._send_json(200, {"ok": True, "db": db})
+                return
+
+            self._send_json(400, {"error": "Unknown database action"})
+            return
+
         if self.path == "/api/gemini":
             content_length = int(self.headers.get("Content-Length", 0))
             raw_body = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else "{}"

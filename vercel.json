@@ -6,6 +6,10 @@
     {
       "source": "/api/gemini",
       "destination": "/api/gemini.js"
+    },
+    {
+      "source": "/api/db",
+      "destination": "/api/db.js"
     }
   ]
 }

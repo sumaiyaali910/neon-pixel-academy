@@ -1,0 +1,230 @@
+{
+  "teachers": [
+    {
+      "id": "t1",
+      "name": "Prof. Aria Vance",
+      "subject": "Physics",
+      "specialty": "Quantum Mechanics, Force Vectors & Electromagnetism",
+      "avatar": "👩‍🚀",
+      "status": "Online • Instant SOS Ready",
+      "room": "Lab 404 / Hologram Pod A",
+      "nextSlot": "Today, 12:30 PM",
+      "slots": [
+        { "id": "t1-s1", "time": "Today, 12:30 PM", "busy": false, "bookedBy": null },
+        { "id": "t1-s2", "time": "Today, 02:00 PM", "busy": true, "bookedBy": "Zain (Extra Class)" },
+        { "id": "t1-s3", "time": "Today, 04:15 PM", "busy": false, "bookedBy": null },
+        { "id": "t1-s4", "time": "Tomorrow, 11:00 AM", "busy": false, "bookedBy": null }
+      ]
+    },
+    {
+      "id": "t2",
+      "name": "Dr. Kenji Takahashi",
+      "subject": "Computer Science",
+      "specialty": "Algorithms, Data Structures & AI Neural Nets",
+      "avatar": "🧙‍♂️",
+      "status": "Online • Debugging Live",
+      "room": "Cyber Deck 202",
+      "nextSlot": "Today, 01:15 PM",
+      "slots": [
+        { "id": "t2-s1", "time": "Today, 01:15 PM", "busy": false, "bookedBy": null },
+        { "id": "t2-s2", "time": "Today, 03:30 PM", "busy": false, "bookedBy": null },
+        { "id": "t2-s3", "time": "Tomorrow, 10:00 AM", "busy": true, "bookedBy": "Ayesha (Algorithm Prep)" }
+      ]
+    },
+    {
+      "id": "t3",
+      "name": "Prof. Elena Rostova",
+      "subject": "Mathematics",
+      "specialty": "Calculus, Linear Algebra & Differential Equations",
+      "avatar": "📐",
+      "status": "Online • Instant SOS Ready",
+      "room": "Euler Suite 108",
+      "nextSlot": "Today, 02:00 PM",
+      "slots": [
+        { "id": "t3-s1", "time": "Today, 02:00 PM", "busy": false, "bookedBy": null },
+        { "id": "t3-s2", "time": "Today, 04:30 PM", "busy": false, "bookedBy": null },
+        { "id": "t3-s3", "time": "Tomorrow, 12:00 PM", "busy": false, "bookedBy": null }
+      ]
+    },
+    {
+      "id": "t4",
+      "name": "Dr. Marcus Sterling",
+      "subject": "Chemistry",
+      "specialty": "Organic Synthesis, Thermodynamics & Molecular Bonding",
+      "avatar": "🧪",
+      "status": "In Lab • SOS Priority Open",
+      "room": "Alchemy Wing B",
+      "nextSlot": "Today, 03:00 PM",
+      "slots": [
+        { "id": "t4-s1", "time": "Today, 03:00 PM", "busy": false, "bookedBy": null },
+        { "id": "t4-s2", "time": "Tomorrow, 01:00 PM", "busy": false, "bookedBy": null }
+      ]
+    },
+    {
+      "id": "t5",
+      "name": "Prof. Maya Lin",
+      "subject": "Biology",
+      "specialty": "Cellular ATP Cycles, Genetics & Neurobiology",
+      "avatar": "🧬",
+      "status": "Online • Instant SOS Ready",
+      "room": "Bio-Dome 3",
+      "nextSlot": "Today, 03:45 PM",
+      "slots": [
+        { "id": "t5-s1", "time": "Today, 03:45 PM", "busy": false, "bookedBy": null },
+        { "id": "t5-s2", "time": "Tomorrow, 11:30 AM", "busy": false, "bookedBy": null }
+      ]
+    },
+    {
+      "id": "t6",
+      "name": "Dr. Julian Vance",
+      "subject": "History",
+      "specialty": "World Civilizations, Scientific Revolution & Archives",
+      "avatar": "🏛️",
+      "status": "Online • Instant SOS Ready",
+      "room": "Chronicle Hall 12",
+      "nextSlot": "Tomorrow, 10:00 AM",
+      "slots": [
+        { "id": "t6-s1", "time": "Tomorrow, 10:00 AM", "busy": false, "bookedBy": null },
+        { "id": "t6-s2", "time": "Tomorrow, 02:00 PM", "busy": false, "bookedBy": null }
+      ]
+    }
+  ],
+  "gameZones": [
+    {
+      "id": "indoor-table-tennis",
+      "type": "INDOOR",
+      "name": "🏓 Neon Table Tennis Pod",
+      "nextFreeIn": "12 mins (Before Class Ends)",
+      "slots": [
+        { "id": "TT-A1", "label": "Table 1 • Seat A", "occupied": true, "bookedBy": "Hamza" },
+        { "id": "TT-A2", "label": "Table 1 • Seat B", "occupied": true, "bookedBy": "Bilal" },
+        { "id": "TT-B1", "label": "Table 2 • Seat A", "occupied": false, "bookedBy": null },
+        { "id": "TT-B2", "label": "Table 2 • Seat B", "occupied": false, "bookedBy": null },
+        { "id": "TT-C1", "label": "Table 3 • Seat A", "occupied": true, "bookedBy": "Sara" },
+        { "id": "TT-C2", "label": "Table 3 • Seat B", "occupied": false, "bookedBy": null },
+        { "id": "TT-D1", "label": "VIP Glow Table A", "occupied": false, "bookedBy": null },
+        { "id": "TT-D2", "label": "VIP Glow Table B", "occupied": false, "bookedBy": null }
+      ]
+    },
+    {
+      "id": "indoor-ps5-vr",
+      "type": "INDOOR",
+      "name": "🎮 Retro Arcade & VR Lounge",
+      "nextFreeIn": "08 mins (Pre-Book Open!)",
+      "slots": [
+        { "id": "VR-01", "label": "VR Pod #1", "occupied": true, "bookedBy": "Usman" },
+        { "id": "VR-02", "label": "VR Pod #2", "occupied": true, "bookedBy": "Ali" },
+        { "id": "VR-03", "label": "Co-Op Couch #1", "occupied": false, "bookedBy": null },
+        { "id": "VR-04", "label": "Co-Op Couch #2", "occupied": false, "bookedBy": null },
+        { "id": "VR-05", "label": "Arcade Cab #1", "occupied": true, "bookedBy": "Hina" },
+        { "id": "VR-06", "label": "Arcade Cab #2", "occupied": false, "bookedBy": null },
+        { "id": "VR-07", "label": "Chess Hologram A", "occupied": false, "bookedBy": null },
+        { "id": "VR-08", "label": "Chess Hologram B", "occupied": false, "bookedBy": null }
+      ]
+    },
+    {
+      "id": "outdoor-futsal",
+      "type": "OUTDOOR",
+      "name": "⚽ Cyan Turf 5v5 Futsal Court",
+      "nextFreeIn": "18 mins (Next Break Slot)",
+      "slots": [
+        { "id": "FT-01", "label": "Striker Slot #1", "occupied": true, "bookedBy": "Omar" },
+        { "id": "FT-02", "label": "Midfield Slot #2", "occupied": true, "bookedBy": "Saad" },
+        { "id": "FT-03", "label": "Midfield Slot #3", "occupied": false, "bookedBy": null },
+        { "id": "FT-04", "label": "Defender Slot #4", "occupied": false, "bookedBy": null },
+        { "id": "FT-05", "label": "Goalie Slot #5", "occupied": false, "bookedBy": null },
+        { "id": "FT-06", "label": "Team B Slot #6", "occupied": true, "bookedBy": "Taha" },
+        { "id": "FT-07", "label": "Team B Slot #7", "occupied": false, "bookedBy": null },
+        { "id": "FT-08", "label": "Team B Slot #8", "occupied": false, "bookedBy": null }
+      ]
+    },
+    {
+      "id": "outdoor-basketball",
+      "type": "OUTDOOR",
+      "name": "🏀 Sunset Neon 3v3 Basketball & Badminton",
+      "nextFreeIn": "05 mins (Almost Free!)",
+      "slots": [
+        { "id": "BB-01", "label": "Hoop North #1", "occupied": true, "bookedBy": "Daniyal" },
+        { "id": "BB-02", "label": "Hoop North #2", "occupied": false, "bookedBy": null },
+        { "id": "BB-03", "label": "Hoop North #3", "occupied": false, "bookedBy": null },
+        { "id": "BB-04", "label": "Badminton Court A", "occupied": true, "bookedBy": "Maha" },
+        { "id": "BB-05", "label": "Badminton Court B", "occupied": false, "bookedBy": null },
+        { "id": "BB-06", "label": "Badminton Court C", "occupied": false, "bookedBy": null },
+        { "id": "BB-07", "label": "Spectator Lounge 1", "occupied": false, "bookedBy": null },
+        { "id": "BB-08", "label": "Spectator Lounge 2", "occupied": false, "bookedBy": null }
+      ]
+    }
+  ],
+  "competitions": [
+    {
+      "id": "ev1",
+      "category": "Hackathon",
+      "title": "⚡ 24-Hour Retro AI & Robotics Game Jam",
+      "time": "Friday • 04:00 PM",
+      "reward": "+250 XP & Neon Badge",
+      "participants": 42
+    },
+    {
+      "id": "ev2",
+      "category": "Study Quest",
+      "title": "🔭 Midnight Rooftop Astrophysics & Telescope Session",
+      "time": "Saturday • 08:30 PM",
+      "reward": "+150 XP & Star Notes",
+      "participants": 29
+    },
+    {
+      "id": "ev3",
+      "category": "Tournament",
+      "title": "🏓 Inter-Department Table Tennis & Chess Blitz Cup",
+      "time": "Tomorrow • 01:30 PM",
+      "reward": "+200 XP & Trophy",
+      "participants": 64
+    },
+    {
+      "id": "ev4",
+      "category": "Peer Group",
+      "title": "📐 Calculus & Algorithms Chill Lo-Fi Cram Circle",
+      "time": "Today • 05:00 PM",
+      "reward": "+120 XP & PDF Pack",
+      "participants": 19
+    }
+  ],
+  "studentBookings": [
+    {
+      "id": "bk-101",
+      "studentName": "Zain Ahmed",
+      "studentRoll": "CS-2026-042",
+      "studentEmail": "zain@campus.edu",
+      "teacherId": "t1",
+      "teacherName": "Prof. Aria Vance",
+      "subject": "Physics",
+      "slotTime": "Today, 02:00 PM",
+      "topic": "Extra Class: Force Vector Decomposition & Inclined Planes",
+      "createdAt": "2026-10-25 11:15 AM"
+    }
+  ],
+  "competitionParticipants": [
+    {
+      "id": "cp-201",
+      "studentName": "Sumaiya Ali",
+      "studentRoll": "AI-2026-001",
+      "studentEmail": "sumaiya@dreambyte.edu",
+      "competitionId": "ev1",
+      "competitionTitle": "⚡ 24-Hour Retro AI & Robotics Game Jam",
+      "category": "Hackathon",
+      "registeredAt": "2026-10-25 10:30 AM"
+    }
+  ],
+  "gameReservations": [
+    {
+      "id": "gr-301",
+      "studentName": "Ramsha",
+      "studentRoll": "AI-2026-002",
+      "zoneId": "indoor-table-tennis",
+      "zoneName": "🏓 Neon Table Tennis Pod",
+      "seatId": "TT-D1",
+      "timeWindow": "Right as Class Ends (In 14 Mins)",
+      "reservedAt": "2026-10-25 11:20 AM"
+    }
+  ]
+}

@@ -561,11 +561,19 @@ window.selectSubject = function (subject) {
    SECTION 1: GEMINI AI TUTOR TERMINAL & VISUAL SOLUTION HOLOGRAM
    ========================================================================== */
 window.fillPresetPrompt = function (promptText, subject = 'General (Anything)', mode = 'general') {
+  const aiSec = document.getElementById('ai-workspace-section');
+  if (aiSec && aiSec.style.display === 'none' && typeof window.switchMainView === 'function') {
+    window.switchMainView('ai');
+  }
   const input = document.getElementById('ai-prompt-input');
   const subSelect = document.getElementById('ai-subject-select');
   const modeSelect = document.getElementById('ai-mode-select');
   if (input) input.value = promptText;
-  if (subSelect && subject) subSelect.value = subject;
+  if (subSelect && subject) {
+    // Match option or default to General (Anything)
+    const hasOption = Array.from(subSelect.options).some((opt) => opt.value === subject);
+    subSelect.value = hasOption ? subject : 'General (Anything)';
+  }
   if (modeSelect && mode) modeSelect.value = mode;
   submitGeminiPrompt();
 };
@@ -612,13 +620,13 @@ window.submitGeminiPrompt = async function (e) {
   const userHtml = `
     <div style="background:rgba(0, 245, 212, 0.12);border-left:4px solid var(--cyan-primary);padding:0.65rem 0.9rem;margin-bottom:0.75rem;">
       <div style="font-family:var(--font-pixel);font-size:0.58rem;color:var(--cyan-primary);margin-bottom:0.25rem;">🧑 YOU ASKED:</div>
-      <div style="color:#fff;font-weight:600;">${prompt.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+      <div style="color:var(--text-main);font-weight:600;">${prompt.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
     </div>
   `;
   const loadingId = 'loading-' + Date.now();
   const loadingHtml = `
     <div id="${loadingId}" style="color:var(--cyan-primary);font-family:var(--font-terminal);font-size:1.2rem;margin-bottom:0.75rem;">
-      ⏳ PIXEL-OWL 9000 is thinking via <code>POST /api/gemini</code>...
+      ⏳ PIXEL-OWL 9000 is thinking & generating your solution...
     </div>
   `;
 
@@ -634,20 +642,59 @@ window.submitGeminiPrompt = async function (e) {
   if (input) input.value = '';
 
   try {
-    const response = await fetch('/api/gemini', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt,
-        subject,
-        mode,
-        history: appState.chatHistory,
-      }),
-    });
+    let data = null;
+    try {
+      const response = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          subject,
+          mode,
+          history: appState.chatHistory,
+        }),
+      });
+      if (response.ok) {
+        data = await response.json();
+      }
+    } catch (_) {
+      data = null;
+    }
 
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error || 'Error communicating with /api/gemini');
+    // Client-side direct AI fallback if backend route is unreachable or returned empty
+    if (!data || !data.reply) {
+      try {
+        const directRes = await fetch('https://text.pollinations.ai/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [
+              {
+                role: 'system',
+                content: `You are PIXEL-OWL 9000, the friendly and brilliant AI assistant inside Neon Pixel Academy. Topic: ${subject}. Mode: ${mode}. Give a clear, accurate, well-structured markdown response with headings and bullet points.`,
+              },
+              ...appState.chatHistory.slice(-4),
+              { role: 'user', content: prompt },
+            ],
+            model: 'openai',
+          }),
+        });
+        if (directRes.ok) {
+          const directText = await directRes.text();
+          if (directText && directText.trim()) {
+            data = {
+              reply: directText.trim(),
+              model: 'pixel-owl-ai-live',
+              diagramType: inferDiagramType(prompt, subject),
+              topicTitle: `AI Synthesis: ${prompt.slice(0, 42)}`,
+            };
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (!data || !data.reply) {
+      throw new Error('Could not reach AI service. Please check your internet connection and try again.');
     }
 
     window.soundEngine.playSuccess();
@@ -658,7 +705,7 @@ window.submitGeminiPrompt = async function (e) {
     if (loaderEl) loaderEl.remove();
 
     const aiReplyHtml = `
-      <div style="background:rgba(16, 27, 59, 0.85);border:1px solid var(--navy-border);border-left:4px solid var(--neon-gold);padding:0.85rem 1rem;margin-bottom:1rem;">
+      <div style="background:var(--navy-surface);color:var(--text-main);border:1px solid var(--navy-border);border-left:4px solid var(--neon-gold);padding:0.85rem 1rem;margin-bottom:1rem;">
         ${formatMarkdownToHTML(data.reply || 'No response received.')}
       </div>
     `;
@@ -1104,7 +1151,13 @@ window.openResourceReader = function (resId) {
 window.askAIAboutResource = function (resId) {
   const item = LIBRARY_RESOURCES.find((r) => r.id === resId);
   if (!item) return;
-  document.getElementById('ai-workspace-section').scrollIntoView({ behavior: 'smooth' });
+  const aiSec = document.getElementById('ai-workspace-section');
+  if (aiSec && aiSec.style.display === 'none' && typeof window.switchMainView === 'function') {
+    window.switchMainView('ai');
+  }
+  if (aiSec) {
+    aiSec.scrollIntoView({ behavior: 'smooth' });
+  }
   fillPresetPrompt(`Summarize and give me a solved example from: ${item.title}`, item.subject, 'notes');
 };
 
@@ -2386,3 +2439,34 @@ window.switchMainView = function (viewMode = 'all') {
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
+
+/* ==========================================================================
+   DARK MODE / LIGHT MODE THEME TOGGLE
+   ========================================================================== */
+const THEME_STORAGE_KEY = 'neon_pixel_academy_theme_mode';
+
+window.toggleThemeMode = function () {
+  const isLight = document.body.classList.toggle('light-mode');
+  const btn = document.getElementById('theme-mode-btn');
+  if (btn) {
+    btn.innerHTML = isLight ? '☀️ LIGHT MODE' : '🌙 DARK MODE';
+  }
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, isLight ? 'light' : 'dark');
+  } catch (_) {}
+  if (window.soundEngine) {
+    window.soundEngine.playClick();
+  }
+  showToast(isLight ? '☀️ Switched to Daylight Mode!' : '🌙 Switched to Neon Dark Mode!');
+};
+
+(function initSavedThemeMode() {
+  try {
+    const saved = localStorage.getItem(THEME_STORAGE_KEY);
+    if (saved === 'light') {
+      document.body.classList.add('light-mode');
+      const btn = document.getElementById('theme-mode-btn');
+      if (btn) btn.innerHTML = '☀️ LIGHT MODE';
+    }
+  } catch (_) {}
+})();

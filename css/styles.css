@@ -32,6 +32,92 @@
   --font-body: 'Space Grotesk', system-ui, -apple-system, sans-serif;
 }
 
+/* ==========================================================================
+   CRISP DAYLIGHT CYAN & NAVY LIGHT MODE (`body.light-mode`)
+   ========================================================================== */
+body.light-mode {
+  --navy-deepest: #e4eefb;
+  --navy-bg: #f2f7ff;
+  --navy-card: #ffffff;
+  --navy-elevated: #e8f1fc;
+  --navy-border: #b8cde8;
+
+  --cyan-primary: #007791;
+  --cyan-bright: #005b73;
+  --cyan-dim: rgba(0, 119, 145, 0.12);
+  --cyan-glow: 0 3px 14px rgba(0, 119, 145, 0.18);
+
+  --neon-magenta: #d91b68;
+  --neon-magenta-glow: 0 3px 12px rgba(217, 27, 104, 0.22);
+
+  --neon-gold: #b86b00;
+  --neon-gold-glow: 0 3px 12px rgba(184, 107, 0, 0.2);
+
+  --neon-lime: #058c65;
+
+  --text-main: #0a1128;
+  --text-muted: #3d557a;
+}
+
+body.light-mode .top-hud {
+  background: rgba(242, 247, 255, 0.94);
+  border-bottom-color: var(--cyan-primary);
+}
+
+body.light-mode .subject-ribbon {
+  background: rgba(232, 241, 252, 0.95);
+}
+
+body.light-mode .hero-banner {
+  background: linear-gradient(135deg, #ffffff, #e8f2ff);
+  box-shadow: 0 6px 20px rgba(10, 17, 40, 0.08), 4px 4px 0px #b8cde8;
+}
+
+body.light-mode .hero-title,
+body.light-mode .section-title,
+body.light-mode .launcher-title,
+body.light-mode h3,
+body.light-mode h4,
+body.light-mode strong {
+  color: #0a1128 !important;
+  text-shadow: none;
+}
+
+body.light-mode .section-number,
+body.light-mode .view-dock-btn.active {
+  color: #ffffff !important;
+}
+
+body.light-mode .pixel-card,
+body.light-mode .terminal-window,
+body.light-mode .solution-hologram-card,
+body.light-mode .arcade-game-screen {
+  box-shadow: 4px 4px 0px #c5d7ee;
+}
+
+body.light-mode .ai-response-screen {
+  background: #f7faff;
+  color: #0a1128;
+}
+
+body.light-mode .launcher-tile,
+body.light-mode .relax-lounge-strip {
+  background: #f0f6ff;
+}
+
+body.light-mode .pixel-btn {
+  box-shadow: 2px 2px 0px #9eb8db;
+}
+
+body.light-mode .pixel-btn.magenta-btn {
+  color: #d91b68;
+  background: rgba(217, 27, 104, 0.1);
+}
+body.light-mode .pixel-btn.magenta-btn:hover {
+  color: #ffffff;
+  background: #d91b68;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

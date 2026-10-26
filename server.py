@@ -400,7 +400,46 @@ class NeonAcademyHandler(http.server.SimpleHTTPRequestHandler):
             api_key = os.environ.get("GEMINI_API_KEY", "").strip()
             smart_fallback = generate_general_ai_response(prompt, subject, mode, history)
 
+            system_instruction = (
+                "You are PIXEL-OWL 9000, a brilliant, versatile, and friendly general-purpose AI assistant "
+                "(powered by Google Gemini) inside the Neon Pixel Academy lounge. "
+                "You can answer ANY question on ANY topic — general knowledge, daily life, coding, creative writing, "
+                "math, science, gaming, history, pop culture, or casual conversation — just like Google Gemini! "
+                "Format your response cleanly with Markdown headings (###), bullet points, and step-by-step clarity. "
+                f"Context category: {subject}. Response style mode: {mode}."
+            )
+
             if not api_key:
+                # Try live keyless intelligent LLM relay so ANY question gets a real AI answer
+                try:
+                    messages = [{"role": "system", "content": system_instruction}]
+                    for h in history[-6:]:
+                        role = "assistant" if h.get("role") == "assistant" else "user"
+                        messages.append({"role": role, "content": str(h.get("content", ""))})
+                    messages.append({"role": "user", "content": prompt})
+
+                    relay_req = urllib.request.Request(
+                        "https://text.pollinations.ai/",
+                        data=json.dumps({"messages": messages, "model": "openai"}).encode("utf-8"),
+                        headers={"Content-Type": "application/json", "User-Agent": "NeonPixelAcademy/1.0"},
+                        method="POST",
+                    )
+                    with urllib.request.urlopen(relay_req, timeout=18) as relay_resp:
+                        ai_text = relay_resp.read().decode("utf-8", errors="ignore").strip()
+                        if ai_text and len(ai_text) > 10 and not ai_text.startswith("<!DOCTYPE"):
+                            self._send_json(200, {
+                                "reply": ai_text,
+                                "diagramType": smart_fallback["diagramType"],
+                                "topicTitle": f"AI Synthesis: {prompt[:44]}",
+                                "model": "pixel-owl-ai-live (Cloud LLM Active)",
+                                "envConfigured": True,
+                                "subject": subject,
+                                "mode": mode,
+                            })
+                            return
+                except Exception:
+                    pass
+
                 self._send_json(200, {
                     "reply": smart_fallback["reply"],
                     "diagramType": smart_fallback["diagramType"],
@@ -413,13 +452,6 @@ class NeonAcademyHandler(http.server.SimpleHTTPRequestHandler):
                 return
 
             # Live call to Google Gemini API using GEMINI_API_KEY from environment
-            system_instruction = (
-                "You are PIXEL-OWL 9000, a brilliant, versatile, and friendly general-purpose AI assistant "
-                "(powered by Google Gemini) inside the Neon Pixel Academy lounge. "
-                "You can answer ANY question on ANY topic — general knowledge, daily life, coding, creative writing, "
-                "math, science, gaming, history, pop culture, or casual conversation — just like Google Gemini! "
-                f"Context category: {subject}. Response style mode: {mode}."
-            )
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
 
             contents = []

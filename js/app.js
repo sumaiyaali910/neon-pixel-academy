@@ -1639,6 +1639,7 @@ window.startJudgePresentation = function () {
 window.skipToLiveFeatureTour = function () {
   clearPresentationTimers();
   presentationActive = true;
+  switchMainView('all');
 
   const overlay = document.getElementById('crt-intro-overlay');
   const tourBar = document.getElementById('tour-banner-bar');
@@ -2330,4 +2331,58 @@ window.exportDatabaseJSON = function () {
 window.resetDatabaseToDefault = async function () {
   localStorage.removeItem(DB_STORAGE_KEY);
   location.reload();
+};
+
+/* ==========================================================================
+   USER-FRIENDLY VIEW MODE SWITCHER & CHILL VIBES POPOVER MENU
+   ========================================================================== */
+window.toggleVibePopover = function (e) {
+  if (e) e.stopPropagation();
+  const menu = document.getElementById('vibe-popover-menu');
+  if (menu) menu.classList.toggle('open');
+};
+
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('vibe-popover-menu');
+  if (menu && menu.classList.contains('open')) {
+    if (!e.target.closest('.vibe-dropdown-wrapper')) {
+      menu.classList.remove('open');
+    }
+  }
+});
+
+window.switchMainView = function (viewMode = 'all') {
+  const viewMap = {
+    all: [
+      'hero-banner-section',
+      'ai-workspace-section',
+      'teacher-section',
+      'library-section',
+      'revision-section',
+      'arena-section',
+      'events-section',
+      'inventory-db-section',
+    ],
+    ai: ['ai-workspace-section'],
+    teachers: ['teacher-section'],
+    study: ['library-section', 'revision-section'],
+    arena: ['arena-section', 'events-section'],
+    admin: ['inventory-db-section'],
+  };
+
+  const allSectionIds = viewMap.all;
+  const visibleIds = viewMap[viewMode] || viewMap.all;
+
+  allSectionIds.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = visibleIds.includes(id) ? '' : 'none';
+    }
+  });
+
+  document.querySelectorAll('.view-dock-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.getAttribute('data-view') === viewMode);
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };

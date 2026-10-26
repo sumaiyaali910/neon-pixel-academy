@@ -13,15 +13,15 @@
 <body class="crt-enabled">
 
   <!-- ====================================================================
-       TOP ARCADE HUD & AUDIO/NEON CONTROLLER
+       TOP ARCADE HUD & USER-FRIENDLY APP NAVIGATION
        ==================================================================== -->
   <header class="top-hud">
     <div class="hud-inner">
-      <a href="#" class="brand-logo">
+      <a href="#" class="brand-logo" onclick="switchMainView('all'); return false;">
         <div class="brand-icon">🦉</div>
         <div>
           <span class="brand-title">NEON PIXEL ACADEMY</span>
-          <span class="brand-subtitle">NAVY & CYAN AI LEARNING LOUNGE • v2.6</span>
+          <span class="brand-subtitle">NAVY & CYAN AI LEARNING LOUNGE</span>
         </div>
       </a>
 
@@ -31,53 +31,74 @@
           <span class="stat-value" id="hud-xp-value">1250 XP</span>
         </div>
         <div class="stat-pill">
-          <span>🔔 CLASS ENDS IN:</span>
+          <span>🔔 BELL IN:</span>
           <span class="stat-value" id="class-bell-countdown">14:25</span>
         </div>
       </div>
 
       <div class="hud-actions">
-        <a href="#inventory-db-section" class="pixel-btn lime-btn" style="text-decoration:none;">
-          🗄️ INVENTORY & DB
-        </a>
         <button class="pixel-btn gold-btn" onclick="startJudgePresentation()">
-          🎬 JUDGE PITCH VIDEO
+          🎬 JUDGE PITCH
         </button>
-        <button id="ambient-toggle-btn" class="pixel-btn" onclick="toggleAmbientLounge()">
-          🎵 LO-FI SYNTH: OFF
-        </button>
-        <button id="rain-toggle-btn" class="pixel-btn" onclick="toggleRainMode()">
-          🌧️ RAIN: OFF
-        </button>
-        <button id="vinyl-toggle-btn" class="pixel-btn gold-btn" onclick="toggleVinylMode()">
-          💿 VINYL: OFF
-        </button>
-        <button id="sfx-toggle-btn" class="pixel-btn lime-btn" onclick="toggleSfxMute()">
-          🔊 8-BIT SFX: ON
-        </button>
-        <button id="crt-toggle-btn" class="pixel-btn magenta-btn" onclick="toggleCRTLines()">
-          📺 CRT: ON
-        </button>
+
+        <!-- Clean Chill Atmosphere & Sound Popover Menu -->
+        <div class="vibe-dropdown-wrapper">
+          <button type="button" class="pixel-btn" onclick="toggleVibePopover(event)">
+            🎧 CHILL VIBES & SFX ▾
+          </button>
+          <div id="vibe-popover-menu" class="vibe-popover-menu" onclick="event.stopPropagation()">
+            <div class="vibe-popover-title">🌊 RELAXING STUDY ATMOSPHERE</div>
+            <button id="ambient-toggle-btn" class="pixel-btn" onclick="toggleAmbientLounge()">
+              🎵 LO-FI SYNTH: OFF
+            </button>
+            <button id="rain-toggle-btn" class="pixel-btn" onclick="toggleRainMode()">
+              🌧️ RAIN MODE: OFF
+            </button>
+            <button id="vinyl-toggle-btn" class="pixel-btn gold-btn" onclick="toggleVinylMode()">
+              💿 VINYL MODE: OFF
+            </button>
+            <button id="sfx-toggle-btn" class="pixel-btn lime-btn" onclick="toggleSfxMute()">
+              🔊 8-BIT SFX: ON
+            </button>
+            <button id="crt-toggle-btn" class="pixel-btn magenta-btn" onclick="toggleCRTLines()">
+              📺 CRT LINES: ON
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
 
   <!-- ====================================================================
-       SUBJECT CATEGORIES & QUICK JUMP RIBBON
+       CLEAN APP MODE DOCK + SUBJECT FILTER RIBBON
        ==================================================================== -->
   <nav class="subject-ribbon">
     <div class="subject-ribbon-inner">
+      <!-- Primary Easy-to-Use Feature Tabs -->
+      <div class="app-view-dock" id="app-view-dock">
+        <button class="view-dock-btn active" data-view="all" onclick="switchMainView('all')">
+          🏠 All Hub
+        </button>
+        <button class="view-dock-btn" data-view="ai" onclick="switchMainView('ai')">
+          🤖 Gemini AI Tutor
+        </button>
+        <button class="view-dock-btn" data-view="teachers" onclick="switchMainView('teachers')">
+          👩‍🏫 Teachers & Extra Class
+        </button>
+        <button class="view-dock-btn" data-view="study" onclick="switchMainView('study')">
+          📚 Notes, Flashcards & Quiz
+        </button>
+        <button class="view-dock-btn" data-view="arena" onclick="switchMainView('arena')">
+          🏓 Game Seats & Quests
+        </button>
+        <button class="view-dock-btn admin-dock-btn" data-view="admin" onclick="switchMainView('admin')">
+          🗄️ Inventory & DB
+        </button>
+      </div>
+
+      <!-- Subject Category Filter Pills -->
       <div class="subject-tabs" id="subject-tabs-container">
         <!-- Rendered by app.js -->
-      </div>
-      <div class="quick-nav-links">
-        <a href="#ai-workspace-section">🤖 Gemini AI & Visual Solutions</a>
-        <a href="#teacher-section">👩‍🏫 1-Click Teacher & Booking</a>
-        <a href="#library-section">📚 Notes, PDFs & Web</a>
-        <a href="#revision-section">🃏 Flashcards & Arcade</a>
-        <a href="#arena-section">🏓 Pre-Book Game Seat</a>
-        <a href="#events-section">🚀 Participate</a>
-        <a href="#inventory-db-section">🗄️ Admin Inventory & DB</a>
       </div>
     </div>
   </nav>
@@ -88,7 +109,7 @@
   <main class="main-container">
 
     <!-- HERO BANNER WITH CUSTOM PIXEL ART PROBLEM->SOLUTION FLOW -->
-    <section class="hero-banner">
+    <section id="hero-banner-section" class="hero-banner">
       <div>
         <div class="hero-badge">
           <span>✨ ZERO BORING LECTURES // 100% RELAXING NEON ARCADE VIBES</span>
@@ -98,24 +119,41 @@
         </h1>
         <p class="hero-description">
           Every click sparks <strong>8-bit chiptune sounds</strong> and <strong>neon color bursts</strong>.
-          Solve tough academic problems with our secure <strong>Gemini AI Tutor</strong> & visual solution holograms,
-          reach teachers in <strong>one click</strong>, unlock study notes & PDFs, battle through revision flashcards,
+          Ask our built-in <strong>Gemini AI Tutor</strong> anything, view interactive solution diagrams,
+          reach teachers in <strong>one click</strong>, flip 3D flashcards,
           and <strong>reserve your indoor or outdoor gaming seat before class ends</strong>!
         </p>
 
-        <div class="hero-cta-row">
-          <button class="pixel-btn gold-btn" onclick="startJudgePresentation()">
-            🎬 WATCH JUDGE PITCH (CRT + TOUR)
-          </button>
-          <a href="/pitch-video.html" class="pixel-btn lime-btn" style="text-decoration:none;">
-            📹 VIDEO STUDIO & MP4 DOWNLOAD
-          </a>
-          <a href="#ai-workspace-section" class="pixel-btn" style="text-decoration:none;">
-            ⚡ SOLVE A PROBLEM WITH AI
-          </a>
-          <a href="#teacher-section" class="pixel-btn magenta-btn" style="text-decoration:none;">
-            🚨 1-CLICK TEACHER SOS
-          </a>
+        <!-- Clean 4-Card Quick Action Launcher -->
+        <div class="quick-launcher-grid">
+          <div class="launcher-tile" onclick="switchMainView('ai')">
+            <span class="launcher-icon">🤖</span>
+            <div>
+              <div class="launcher-title">Ask Gemini AI</div>
+              <div class="launcher-sub">General & Study Q&A + Diagrams</div>
+            </div>
+          </div>
+          <div class="launcher-tile" onclick="switchMainView('teachers')">
+            <span class="launcher-icon">👩‍🏫</span>
+            <div>
+              <div class="launcher-title">Teacher SOS & Slots</div>
+              <div class="launcher-sub">1-Click Ping & Extra Class</div>
+            </div>
+          </div>
+          <div class="launcher-tile" onclick="switchMainView('study')">
+            <span class="launcher-icon">🃏</span>
+            <div>
+              <div class="launcher-title">Notes & Flashcards</div>
+              <div class="launcher-sub">PDFs, 3D Cards & Boss Quiz</div>
+            </div>
+          </div>
+          <div class="launcher-tile" onclick="switchMainView('arena')">
+            <span class="launcher-icon">🏓</span>
+            <div>
+              <div class="launcher-title">Book Game Seat</div>
+              <div class="launcher-sub">Indoor/Outdoor & Quests</div>
+            </div>
+          </div>
         </div>
 
         <div class="relax-lounge-strip">
@@ -123,11 +161,11 @@
             <div class="eq-bars" id="lounge-eq-bars">
               <span></span><span></span><span></span><span></span>
             </div>
-            <span>RELAXING SYNTHWAVE STUDY WAVE // CLICK "LO-FI SYNTH" ABOVE TO UNWIND</span>
+            <span>🎧 Use "CHILL VIBES & SFX" in the top bar for Lo-Fi Synth, Rain & Vinyl!</span>
           </div>
-          <span style="font-family:var(--font-terminal);color:var(--text-muted);font-size:1.1rem;">
-            🔐 Backend: <code>/api/gemini</code> (<code>process.env.GEMINI_API_KEY</code>)
-          </span>
+          <a href="/pitch-video.html" style="font-family:var(--font-terminal);color:var(--neon-gold);font-size:1.02rem;text-decoration:none;">
+            📹 [Open Video Studio & MP4 Download ↗]
+          </a>
         </div>
       </div>
 
@@ -139,7 +177,7 @@
           class="hero-visual-img"
         />
         <div class="hero-visual-caption">
-          <span>🖼️ VISUAL SOLUTION WORKFLOW: PROBLEM ➔ AI & TEACHER ➔ MASTERY</span>
+          <span>🖼️ VISUAL WORKFLOW: PROBLEM ➔ AI & TEACHER ➔ MASTERY</span>
           <span style="color:var(--neon-gold);">[16-BIT HD]</span>
         </div>
       </div>
